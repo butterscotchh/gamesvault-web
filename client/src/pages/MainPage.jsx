@@ -1,21 +1,22 @@
 import Navbar from '../components/common/Navbar';
 import Footer from '../components/common/Footer';
 import HandheldShowcase from '../components/3D/HandheldShowcase';
+import ProductCarousel from '../components/carousel/ProductCarousel';
+import { dummyProducts } from '../data/dummyProducts';
 
 const MainPage = () => {
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen bg-white">
       <Navbar />
       
-      {/* Main Content */}
-      <main className="flex-1 pt-16">
-        {/* Hero */}
-        <section className="bg-gradient-to-b from-gray-50 to-white py-16">
-          <div className="container mx-auto px-4 text-center">
-            <h1 className="text-4xl md:text-5xl font-bold text-brick-700 mb-4">
+      <main className="pt-16">
+        {/* HERO - PASTI CENTER */}
+        <section className="py-16 bg-gray-50">
+          <div className="max-w-7xl mx-auto px-4 text-center">
+            <h1 className="text-4xl font-bold text-brick-700 mb-4">
               Gaming Handheld Showroom
             </h1>
-            <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+            <p className="text-gray-600 max-w-2xl mx-auto">
               Temukan koleksi gaming handheld terbaik dari berbagai generasi
             </p>
             <div className="flex justify-center gap-4 mt-4 text-sm text-gray-500">
@@ -32,18 +33,19 @@ const MainPage = () => {
           </div>
         </section>
 
-        {/* 3D Showcase - CP-3 */}
+        {/* 3D - PASTI CENTER */}
         <HandheldShowcase />
 
-        {/* Placeholder untuk CP-4 Carousel */}
-        <section className="py-16 bg-white">
-          <div className="container mx-auto px-4">
-            <h2 className="text-2xl font-bold text-center text-gray-800 mb-8">
+        {/* CAROUSEL - PASTI CENTER */}
+        <section className="py-16">
+          <div className="max-w-7xl mx-auto px-4">
+            <h2 className="text-3xl font-bold text-center text-gray-800 mb-2">
               Our Products
             </h2>
-            <div className="bg-gray-50 rounded-2xl p-8 border border-gray-200 text-center">
-              <p className="text-gray-400">Product Carousel - Coming Soon (CP-4)</p>
-            </div>
+            <p className="text-gray-500 text-center mb-10">
+              Koleksi handheld terbaik untuk kamu
+            </p>
+            <ProductCarousel products={dummyProducts} />
           </div>
         </section>
       </main>
