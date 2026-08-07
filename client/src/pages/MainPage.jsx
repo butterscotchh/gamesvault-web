@@ -1,5 +1,6 @@
 import Navbar from '../components/common/Navbar';
 import Footer from '../components/common/Footer';
+import HandheldShowcase from '../components/3D/HandheldShowcase';
 
 const MainPage = () => {
   return (
@@ -8,39 +9,43 @@ const MainPage = () => {
       
       {/* Main Content */}
       <main className="flex-1 pt-16">
-        <div className="container mx-auto px-4 py-20 text-center">
-          <h1 className="text-4xl md:text-6xl font-bold text-brick-700 mb-4">
-            Gaming Handheld Showroom
-          </h1>
-          <p className="text-gray-600 text-lg mb-2">
-            Temukan koleksi gaming handheld terbaik
-          </p>
-          <p className="text-gray-400 text-sm">
-            PSP · DS Lite · PS Vita · 3DS · 2DS
-          </p>
-
-          {/* Placeholder untuk CP-3 & CP-4 */}
-          <div className="mt-12 grid grid-cols-2 md:grid-cols-5 gap-4 max-w-4xl mx-auto">
-            {['PSP', 'DS Lite', 'PS Vita', '3DS', '2DS'].map((device) => (
-              <div
-                key={device}
-                className="bg-gray-50 rounded-xl p-6 border border-gray-200 hover:shadow-lg transition-shadow"
-              >
-                <div className="w-full h-24 bg-gradient-to-br from-gray-200 to-gray-300 rounded-lg mb-3" />
-                <p className="text-sm font-medium text-gray-700">{device}</p>
-                <p className="text-xs text-gray-400">Coming Soon</p>
-              </div>
-            ))}
+        {/* Hero */}
+        <section className="bg-gradient-to-b from-gray-50 to-white py-16">
+          <div className="container mx-auto px-4 text-center">
+            <h1 className="text-4xl md:text-5xl font-bold text-brick-700 mb-4">
+              Gaming Handheld Showroom
+            </h1>
+            <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+              Temukan koleksi gaming handheld terbaik dari berbagai generasi
+            </p>
+            <div className="flex justify-center gap-4 mt-4 text-sm text-gray-500">
+              <span>PSP</span>
+              <span>•</span>
+              <span>DS Lite</span>
+              <span>•</span>
+              <span>PS Vita</span>
+              <span>•</span>
+              <span>3DS</span>
+              <span>•</span>
+              <span>2DS</span>
+            </div>
           </div>
+        </section>
 
-          {/* Placeholder untuk CP-4 Carousel */}
-          <div className="mt-16">
-            <h2 className="text-2xl font-bold text-gray-800 mb-8">Our Products</h2>
-            <div className="bg-gray-50 rounded-2xl p-8 border border-gray-200">
+        {/* 3D Showcase - CP-3 */}
+        <HandheldShowcase />
+
+        {/* Placeholder untuk CP-4 Carousel */}
+        <section className="py-16 bg-white">
+          <div className="container mx-auto px-4">
+            <h2 className="text-2xl font-bold text-center text-gray-800 mb-8">
+              Our Products
+            </h2>
+            <div className="bg-gray-50 rounded-2xl p-8 border border-gray-200 text-center">
               <p className="text-gray-400">Product Carousel - Coming Soon (CP-4)</p>
             </div>
           </div>
-        </div>
+        </section>
       </main>
 
       <Footer />
