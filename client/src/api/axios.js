@@ -9,4 +9,22 @@ const api = axios.create({
   },
 });
 
+// Interceptor: Tambah JWT ke setiap request
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('adminToken');
+    console.log('Token from localStorage:', token); // DEBUG
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+      console.log('✅ Token added to headers');
+    } else {
+      console.log('❌ No token found!');
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 export default api;

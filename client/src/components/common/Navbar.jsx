@@ -20,8 +20,32 @@ const Navbar = () => {
 
     setIsLoading(true);
     try {
-      const response = await api.post('/validate-promo', {
-        code: promoCode.trim()
+      // Cek apakah ada token di localStorage
+      const existingToken = localStorage.getItem('adminToken');
+      
+      // Kalo ada token, cek apakah masih valid
+      if (existingToken) {
+        try {
+          // Decode token untuk cek expired
+          const payload = JSON.parse(atob(existingToken.split('.')[1]));
+          const isExpired = payload.exp * 1000 < Date.now();
+          
+          if (!isExpired) {
+            // Token masih valid → langsung ke admin
+            toast.success('Session masih aktif! Redirecting...');
+            setTimeout(() => navigate('/admin'), 1000);
+            setIsLoading(false);
+            setPromoCode('');
+            return;
+          }
+        } catch (error) {
+          console.log('Token invalid, proceed to login');
+        }
+      }
+
+      // Kalo ga ada token atau expired → validasi promo code
+      const response = await api.post('/validate-promo', { 
+        code: promoCode.trim() 
       });
 
       if (response.data.success) {
@@ -29,8 +53,8 @@ const Navbar = () => {
         localStorage.setItem('promoToken', response.data.token);
         setTimeout(() => navigate('/login'), 1000);
       }
+
     } catch (error) {
-      console.error('Promo error:', error);
       toast.error(error.response?.data?.error || 'Kode promo tidak valid!');
     } finally {
       setIsLoading(false);
