@@ -9,13 +9,4 @@ const api = axios.create({
   },
 });
 
-// JWT Interceptor (nanti di CP-6)
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('adminToken');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
-
 export default api;

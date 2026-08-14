@@ -1,10 +1,28 @@
 import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import ProductCard from './ProductCard';
+import api from '../../api/axios';
 
-const ProductCarousel = ({ products }) => {
+const ProductCarousel = () => {
+  const [products, setProducts] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
+  const [loading, setLoading] = useState(true);
   const itemsPerPage = 4;
+
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        const response = await api.get('/products');
+        setProducts(response.data);
+      } catch (error) {
+        console.error('Error loading products:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadProducts();
+  }, []);
+
   const totalPages = Math.ceil(products.length / itemsPerPage);
 
   const nextPage = () => setCurrentPage((prev) => (prev + 1) % totalPages);
@@ -12,24 +30,32 @@ const ProductCarousel = ({ products }) => {
   const goToPage = (index) => setCurrentPage(index);
 
   useEffect(() => {
-    const timer = setInterval(nextPage, 5000);
-    return () => clearInterval(timer);
+    if (totalPages > 1) {
+      const timer = setInterval(nextPage, 5000);
+      return () => clearInterval(timer);
+    }
   }, [totalPages]);
 
   const start = currentPage * itemsPerPage;
   const currentItems = products.slice(start, start + itemsPerPage);
 
+  if (loading) {
+    return <div className="text-center py-8 text-gray-500">Loading products...</div>;
+  }
+
+  if (products.length === 0) {
+    return <div className="text-center py-8 text-gray-500">Belum ada produk</div>;
+  }
+
   return (
     <div className="w-full">
       <div className="relative">
-        {/* Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {currentItems.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>
 
-        {/* Tombol */}
         {totalPages > 1 && (
           <>
             <button
@@ -48,7 +74,6 @@ const ProductCarousel = ({ products }) => {
         )}
       </div>
 
-      {/* Dots */}
       {totalPages > 1 && (
         <div className="flex justify-center gap-2 mt-6">
           {Array.from({ length: totalPages }).map((_, index) => (

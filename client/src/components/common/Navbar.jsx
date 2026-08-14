@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Gamepad2, Shield } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import api from '../../api/axios';
 import toast from 'react-hot-toast';
 
 const Navbar = () => {
@@ -18,20 +19,19 @@ const Navbar = () => {
     }
 
     setIsLoading(true);
-    
     try {
-      // DUMMY VALIDATION - NANTI DIGANTI PAKAI API
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      if (promoCode.trim() === 'GAMER2026') {
+      const response = await api.post('/validate-promo', {
+        code: promoCode.trim()
+      });
+
+      if (response.data.success) {
         toast.success('Promo code valid! Redirecting...');
-        localStorage.setItem('promoToken', 'dummy_promo_token');
+        localStorage.setItem('promoToken', response.data.token);
         setTimeout(() => navigate('/login'), 1000);
-      } else {
-        toast.error('Kode promo tidak valid!');
       }
     } catch (error) {
-      toast.error('Terjadi kesalahan, coba lagi!');
+      console.error('Promo error:', error);
+      toast.error(error.response?.data?.error || 'Kode promo tidak valid!');
     } finally {
       setIsLoading(false);
       setPromoCode('');
@@ -78,7 +78,7 @@ const Navbar = () => {
             </button>
           </form>
 
-          {/* Right Side - Logout (kalo admin login) */}
+          {/* Right Side - Logout */}
           <div className="flex items-center gap-3 shrink-0">
             {isAuthenticated && (
               <>
