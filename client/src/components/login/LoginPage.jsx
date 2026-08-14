@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Gamepad2, Shield, Mail, Lock } from 'lucide-react';
+import { Gamepad2, Mail, Lock } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import api from '../../api/axios';
 import toast from 'react-hot-toast';
 
 const LoginPage = () => {
@@ -21,17 +22,21 @@ const LoginPage = () => {
 
     setIsLoading(true);
     try {
-      // DUMMY VALIDASI - nanti diganti pake API
-      if (username === 'admin' && password === 'admin123') {
-        const dummyToken = 'dummy_jwt_token_' + Date.now();
-        login(dummyToken);
+      const response = await api.post('/login', {
+        username: username.trim(),
+        password: password.trim()
+      });
+
+      if (response.data.success) {
+        // Simpan token (nanti pake JWT)
+        const token = response.data.token || 'dummy_token_' + Date.now();
+        login(token);
         toast.success('Login berhasil!');
         navigate('/admin');
-      } else {
-        toast.error('Username atau password salah!');
       }
     } catch (error) {
-      toast.error('Terjadi kesalahan, coba lagi!');
+      console.error('Login error:', error);
+      toast.error(error.response?.data?.error || 'Username atau password salah!');
     } finally {
       setIsLoading(false);
     }
@@ -100,10 +105,7 @@ const LoginPage = () => {
                   Loading...
                 </>
               ) : (
-                <>
-                  <Shield className="w-5 h-5" />
-                  Login
-                </>
+                'Login'
               )}
             </button>
           </form>
@@ -117,6 +119,13 @@ const LoginPage = () => {
               ← Kembali ke Beranda
             </button>
           </div>
+        </div>
+
+        {/* Info Credential (untuk testing) */}
+        <div className="mt-4 text-center">
+          <p className="text-xs text-gray-400">
+            Demo: admin / admin123
+          </p>
         </div>
       </div>
     </div>
