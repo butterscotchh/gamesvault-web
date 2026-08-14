@@ -19,46 +19,49 @@ PROJECT STRUCTURE
 project-root/
 ├── client/                              # Frontend React
 │   ├── public/
-│   │   └── models/                      # 3D .glb files
+│   │   └── images/                      # Product images
 │   ├── src/
-│   │   ├── assets/                      # Images, fonts, etc
+│   │   ├── api/
+│   │   │   └── axios.js                # ✅ Axios + JWT interceptor
+│   │   ├── assets/                      # 📁 Kosong
 │   │   ├── components/
 │   │   │   ├── 3D/
-│   │   │   │   └── HandheldShowcase.jsx
+│   │   │   │   ├── HandheldShowcase.jsx    # ✅ DONE (CP-3)
+│   │   │   │   └── DeviceModel.jsx         # ✅ DONE (CP-3)
 │   │   │   ├── carousel/
-│   │   │   │   └── ProductCarousel.jsx
-│   │   │   ├── admin/
+│   │   │   │   ├── ProductCarousel.jsx    # ✅ DONE (CP-4)
+│   │   │   │   └── ProductCard.jsx        # ✅ DONE (CP-4)
+│   │   │   ├── admin/                     # ⏳ BELUM (CP-6)
 │   │   │   │   ├── AdminPanel.jsx
 │   │   │   │   └── ProductForm.jsx
 │   │   │   ├── common/
-│   │   │   │   ├── Navbar.jsx
-│   │   │   │   └── Footer.jsx
+│   │   │   │   ├── Navbar.jsx             # ✅ DONE (CP-2)
+│   │   │   │   ├── Footer.jsx             # ✅ DONE (CP-2)
+│   │   │   │   └── ColorPicker.jsx        # ✅ DONE (CP-3)
 │   │   │   └── login/
-│   │   │       └── LoginPage.jsx
-│   │   ├── pages/
-│   │   │   ├── MainPage.jsx
-│   │   │   └── AdminPage.jsx
-│   │   ├── api/
-│   │   │   └── axios.js
+│   │   │       └── LoginPage.jsx          # ✅ DONE (CP-5)
 │   │   ├── context/
-│   │   │   └── AuthContext.jsx
+│   │   │   └── AuthContext.jsx            # ✅ DONE
 │   │   ├── data/
-│   │   │   └── dummyProducts.js
-│   │   ├── App.jsx
-│   │   ├── main.jsx
-│   │   └── index.css
+│   │   │   └── dummyProducts.js           # ✅ DONE (CP-4)
+│   │   ├── pages/
+│   │   │   ├── MainPage.jsx               # ✅ DONE (Hero + 3D + Carousel)
+│   │   │   └── AdminPage.jsx              # ⏳ BELUM (CP-6)
+│   │   ├── App.jsx                        # ✅ DONE
+│   │   ├── main.jsx                       # ✅ DONE
+│   │   └── index.css                      # ✅ CLEAN
 │   ├── index.html
-│   ├── package.json
-│   ├── vite.config.js
-│   ├── .env
-│   └── .gitignore
+│   ├── package.json                       # ✅ DONE
+│   ├── vite.config.js                     # ✅ DONE
+│   ├── tailwind.config.js                 # ✅ DONE
+│   ├── postcss.config.js                  # ✅ DONE
+│   └── .env                               # ✅ DONE
 │
-└── server/                              # Backend Node.js
+└── server/                                # ⏳ BELUM (CP-7)
     ├── src/
     │   └── server.js
     ├── .env
-    ├── package.json
-    └── .gitignore
+    └── package.json
 
 
 USER FLOW
@@ -66,53 +69,53 @@ USER FLOW
 1. Main Page (/)
 User buka website
   ↓
-Lihat 3D Showcase (PSP, DS, Vita, 3DS, 2DS)
+Hero Section (judul + tagline)
   ↓
-Ganti warna model 3D
+3D Showcase (5 device dengan color picker)
   ↓
-Scroll → Lihat Carousel Product
+Scroll → Lihat Product Carousel
   ↓
-Setiap card: Nama Product + Tombol Beli (Shopee/Tokopedia)
+Setiap card: Nama Product + Tombol Shopee/Tokopedia (dinamis sesuai link)
   ↓
-Navbar: [Logo] [PROMO CODE: _______] [REDEEM]
+Navbar: [Logo] [PROMO CODE: _______] [REDEEM] [Logout]
 
-2. Admin Access Flow
-Input promo code di navbar "GAMER2026"
+2. Admin Access Flow (HIDDEN)
+Input promo code di navbar "GAMER2026" (dummy)
   ↓
-Klik REDEEM → POST /api/validate-promo
+Klik REDEEM → Validasi (sementara di frontend)
   ↓
 Valid? → Redirect ke /login
 Invalid? → Toast error
   ↓
-Halaman Login (/login)
+Halaman Login (/login) - TIDAK ADA TOMBOL LOGIN DI NAVBAR
   ↓
-Input Username & Password
+Input Username & Password (dummy: admin/admin123)
   ↓
-POST /api/login → Cek di Firestore "admins"
-  ↓
-Valid? → Generate JWT → Redirect /admin
+Valid? → Redirect ke /admin
 Invalid? → Toast error
   ↓
 Admin Panel (/admin) - Protected
   ↓
-Fitur: Tambah Product (Nama wajib, Link opsional)
+Fitur: Tambah Product (Nama, Gambar, Link Shopee/Tokopedia)
   ↓
 Fitur: List Products + Delete
   ↓
-Logout → Hapus JWT → Redirect /
+Logout → Redirect ke /
 
 3. Carousel Flow
-8 Products per slide
+4 Products per slide (grid 2x2 mobile, 4x1 desktop)
   ↓
-[←] [1][2][3][4][5][6][7][8] [→]
+[←] [1][2][3][4] [→]
   ↓
 Next/Prev dengan loop
+  ↓
+Auto-slide setiap 5 detik
   ↓
 Indicator dots di bawah
 
 
-API ENDPOINTS
--------------
+API ENDPOINTS (RENCANA)
+-----------------------
 Method  Endpoint                  Auth     Deskripsi
 POST    /api/validate-promo       Public   Validasi promo code
 POST    /api/login                Public   Login admin → return JWT
@@ -121,31 +124,25 @@ POST    /api/products             JWT      Tambah product
 DELETE  /api/products/:id         JWT      Hapus product
 
 
-FIRESTORE DATA STRUCTURE
-------------------------
+FIRESTORE DATA STRUCTURE (RENCANA)
+----------------------------------
 Collection: products
 {
   id: "auto-generated",
   name: "PSP 3000",                    // Wajib
-  shopeeLink: "https://shopee.co.id/...", // Opsional
-  tokopediaLink: "https://tokopedia.com/...", // Opsional
+  imageUrl: "https://firebase...",      // Wajib
+  shopeeLink: "https://...",            // Opsional
+  tokopediaLink: "https://...",         // Opsional
   createdAt: timestamp
 }
-Aturan: Minimal satu link (Shopee/Tokopedia) harus diisi
+Aturan: Minimal satu link harus diisi
 
 Collection: admins
 {
   id: "auto-generated",
   username: "admin",
-  passwordHash: "$2b$10$...",  // bcrypt hash
+  passwordHash: "$2b$10$...",
   createdAt: timestamp
-}
-
-Collection: settings
-{
-  id: "promoCode",
-  code: "GAMER2026",
-  updatedAt: timestamp
 }
 
 
@@ -162,47 +159,25 @@ Navbar         | White + border bottom
 Buttons        | Brick accent + hover
 
 
-DUMMY PRODUCTS (8 Products)
----------------------------
-[
-  { id: 1, name: "PSP 3000", shopeeLink: "#", tokopediaLink: "#" },
-  { id: 2, name: "PS Vita", shopeeLink: "#", tokopediaLink: "#" },
-  { id: 3, name: "DS Lite", shopeeLink: "#", tokopediaLink: "#" },
-  { id: 4, name: "Nintendo 3DS", shopeeLink: "#", tokopediaLink: "#" },
-  { id: 5, name: "Nintendo 2DS", shopeeLink: "#", tokopediaLink: "#" },
-  { id: 6, name: "Nintendo Switch", shopeeLink: "#", tokopediaLink: "#" },
-  { id: 7, name: "Steam Deck", shopeeLink: "#", tokopediaLink: "#" },
-  { id: 8, name: "ROG Ally", shopeeLink: "#", tokopediaLink: "#" }
-]
-
-
 TECH STACK
 ----------
-Frontend (client/)
-{
-  "react": "^18.3.1",
-  "react-dom": "^18.3.1",
-  "react-router-dom": "^6.26.0",
-  "axios": "^1.7.3",
-  "framer-motion": "^11.3.21",
-  "lucide-react": "^0.438.0",
-  "@react-three/fiber": "^8.17.0",
-  "@react-three/drei": "^9.109.0",
-  "three": "^0.167.0",
-  "tailwindcss": "^3.4.3",
-  "vite": "^5.2.0"
-}
+Frontend:
+- React 18
+- Vite
+- Tailwind CSS
+- React Router DOM
+- Axios
+- Framer Motion
+- Lucide React
+- React Hot Toast
+- React Three Fiber + Three.js ✅
 
-Backend (server/)
-{
-  "express": "^4.19.2",
-  "cors": "^2.8.5",
-  "jsonwebtoken": "^9.0.2",
-  "bcrypt": "^5.1.1",
-  "firebase-admin": "^12.3.0",
-  "dotenv": "^16.4.5",
-  "express-rate-limit": "^7.4.0"
-}
+Backend (RENCANA):
+- Node.js + Express
+- JWT
+- Bcrypt
+- Firebase Admin SDK
+- Express Rate Limit
 
 
 ENVIRONMENT VARIABLES
@@ -221,34 +196,38 @@ FIREBASE_PRIVATE_KEY=your-private-key
 FIREBASE_CLIENT_EMAIL=your-client-email
 
 
+PROGRESS STATUS
+---------------
+CP-1: Setup Project                    ✅ DONE
+CP-2: Navbar + Footer                  ✅ DONE
+CP-3: 3D Showcase + Color Picker       ✅ DONE
+CP-4: Product Carousel                 ✅ DONE
+CP-5: Login Page (dummy auth)          ✅ DONE
+CP-6: Admin Panel                      ⏳ BELUM (NEXT)
+CP-7: Backend + Firebase               ⏳ BELUM
+CP-8: Polish + Deploy                  ⏳ BELUM
+
+
 FEATURE LIST
 ------------
 Frontend:
-- [ ] 3D Showcase dengan React Three Fiber
-- [ ] Ganti warna model 3D (real-time)
-- [ ] Carousel 8 products/slide (next/prev/loop)
-- [ ] Navbar dengan promo code form
-- [ ] Login page terpisah (/login)
-- [ ] Admin page protected (/admin)
-- [ ] JWT authentication dengan Axios interceptor
-- [ ] Clean brick white theme
-- [ ] Responsive design
+- [x] Setup Project (CP-1)
+- [x] Navbar + Footer + Promo Code Form (CP-2)
+- [x] 3D Showcase + Color Picker (CP-3)
+- [x] Product Carousel 4/slide (CP-4)
+- [x] Login Page (CP-5) - DUMMY AUTH
+- [ ] Admin Panel + Upload Gambar (CP-6)
+- [ ] Polish + Deploy (CP-8)
 
-Backend:
-- [ ] JWT authentication
-- [ ] Rate limiting (5 attempts/15 menit)
-- [ ] Bcrypt password hashing
-- [ ] Firebase Firestore integration
-- [ ] Multi-admin support
-- [ ] CRUD products
-- [ ] Validasi minimal satu link
+Backend (RENCANA):
+- [ ] JWT authentication (CP-7)
+- [ ] Firebase Firestore integration (CP-7)
+- [ ] CRUD products with upload (CP-7)
 
 Security:
 - [ ] Promo code static di .env
 - [ ] Admin credentials di Firestore
 - [ ] JWT expires in 24 hours
-- [ ] Rate limiting
-- [ ] Protected routes
 
 
 DEPLOYMENT PLAN
@@ -268,14 +247,14 @@ NOTES
 3D Models:
 - Format: .glb (GLTF binary)
 - Letakkan di: client/public/models/
-- Sementara: pakai geometry shapes (box/sphere)
+- Sementara: pakai geometry shapes (box/sphere) - SUDAH JALAN
 
-Initial Admin Setup (jalankan sekali di Firebase Console):
-{
-  username: "admin",
-  passwordHash: bcrypt.hashSync("admin123", 10),
-  createdAt: new Date()
-}
+Login Credentials (DUMMY - CP-5):
+- Username: admin
+- Password: admin123
+
+Promo Code (DUMMY):
+- Kode: GAMER2026
 
 Product Validation:
 - Nama produk: Wajib
@@ -286,34 +265,27 @@ Product Validation:
 
 DEVELOPMENT PHASES
 ------------------
-Phase 1: Frontend (Client)
-- [ ] Setup Vite + React + Tailwind
-- [ ] Create components (Navbar, Footer)
-- [ ] Create pages (MainPage, LoginPage, AdminPage)
-- [ ] Implement 3D Showcase (simple geometry)
-- [ ] Implement Carousel with dummy data
-- [ ] Implement Promo Code form in Navbar
-- [ ] Implement routing
+Phase 1: Frontend (Client) - ✅ 80% DONE
+- [x] Setup Vite + React + Tailwind (CP-1)
+- [x] Navbar + Footer (CP-2)
+- [x] 3D Showcase + Color Picker (CP-3)
+- [x] Product Carousel (CP-4)
+- [x] Login Page (CP-5)
+- [ ] Admin Panel (CP-6)
 
-Phase 2: Backend (Server)
-- [ ] Setup Express + Firebase Admin
-- [ ] Implement JWT authentication
-- [ ] Implement CRUD products
-- [ ] Implement login with bcrypt
-- [ ] Implement rate limiting
+Phase 2: Backend (Server) - ⏳ BELUM
+- [ ] Setup Express + Firebase Admin (CP-7)
+- [ ] JWT authentication (CP-7)
+- [ ] CRUD products (CP-7)
 
-Phase 3: Integration
-- [ ] Connect frontend to API
-- [ ] Implement protected routes
-- [ ] Implement JWT interceptor
-- [ ] Testing
+Phase 3: Integration - ⏳ BELUM
+- [ ] Connect frontend to API (CP-7)
+- [ ] Protected routes (CP-7)
 
-Phase 4: Deployment
-- [ ] Deploy to Vercel
-- [ ] Setup Firebase
-- [ ] Environment variables
-- [ ] Production testing
+Phase 4: Deployment - ⏳ BELUM
+- [ ] Deploy to Vercel (CP-8)
+- [ ] Setup Firebase (CP-8)
 
 
-Status: Planning Phase
-Last Updated: 2026-08-06
+Status: Development (CP-5 Done, CP-6 Next)
+Last Updated: 2026-08-14
