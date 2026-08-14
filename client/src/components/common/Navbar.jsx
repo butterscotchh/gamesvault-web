@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Gamepad2, Shield } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import api from '../../api/axios';
 import toast from 'react-hot-toast';
 
 const Navbar = () => {
@@ -17,16 +16,22 @@ const Navbar = () => {
       toast.error('Masukkan promo code!');
       return;
     }
+
     setIsLoading(true);
+    
     try {
-      const response = await api.post('/validate-promo', { code: promoCode.trim() });
-      if (response.data.success) {
+      // DUMMY VALIDATION - NANTI DIGANTI PAKAI API
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      if (promoCode.trim() === 'GAMER2026') {
         toast.success('Promo code valid! Redirecting...');
-        localStorage.setItem('promoToken', response.data.token);
+        localStorage.setItem('promoToken', 'dummy_promo_token');
         setTimeout(() => navigate('/login'), 1000);
+      } else {
+        toast.error('Kode promo tidak valid!');
       }
     } catch (error) {
-      toast.error(error.response?.data?.error || 'Kode promo tidak valid!');
+      toast.error('Terjadi kesalahan, coba lagi!');
     } finally {
       setIsLoading(false);
       setPromoCode('');
@@ -51,7 +56,7 @@ const Navbar = () => {
             </span>
           </div>
 
-          {/* Promo Code Form - SATU FORM UNTUK SEMUA */}
+          {/* Promo Code Form */}
           <form onSubmit={handleRedeem} className="flex items-center gap-2 flex-1 max-w-md mx-4">
             <div className="relative flex-1">
               <Shield className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -73,9 +78,9 @@ const Navbar = () => {
             </button>
           </form>
 
-          {/* Right Side - Admin/Login */}
+          {/* Right Side - Logout (kalo admin login) */}
           <div className="flex items-center gap-3 shrink-0">
-            {isAuthenticated ? (
+            {isAuthenticated && (
               <>
                 <span className="text-sm text-gray-600 hidden sm:inline">Admin</span>
                 <button
@@ -85,13 +90,6 @@ const Navbar = () => {
                   Logout
                 </button>
               </>
-            ) : (
-              <button
-                onClick={() => navigate('/login')}
-                className="px-4 py-2 text-sm text-gray-600 hover:text-brick-600 font-medium"
-              >
-                Login
-              </button>
             )}
           </div>
         </div>
