@@ -1,8 +1,9 @@
 const express = require('express');
 const cors = require('cors');
-const fs = require('fs');
-const path = require('path');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 require('dotenv').config();
+const { db } = require('./firebase');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -11,60 +12,81 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-// ============ PATH FILE ============
-const DATA_PATH = path.join(__dirname, '../data/products.json');
-const ADMINS_PATH = path.join(__dirname, '../data/admins.json');
-
-// ============ HELPER FUNCTIONS ============
-
-const readData = (filePath) => {
-  try {
-    const data = fs.readFileSync(filePath, 'utf8');
-    return JSON.parse(data);
-  } catch (error) {
-    console.error('\x1b[31m❌ Error reading data:\x1b[0m', error);
-    return [];
+// ============ JWT VERIFY MIDDLEWARE ============
+const verifyToken = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    return res.status(401).json({ error: 'Token diperlukan!' });
   }
-};
 
-const writeData = (filePath, data) => {
+  const token = authHeader.split(' ')[1];
   try {
-    fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf8');
-    return true;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;
+    next();
   } catch (error) {
-    console.error('\x1b[31m❌ Error writing data:\x1b[0m', error);
-    return false;
+    return res.status(401).json({ error: 'Token tidak valid!' });
   }
 };
 
 // ============ AUTH ENDPOINTS ============
 
 // POST: Login Admin
-app.post('/api/login', (req, res) => {
-  const { username, password } = req.body;
-  const admins = readData(ADMINS_PATH);
+app.post('/api/login', async (req, res) => {
+  try {
+    const { username, password } = req.body;
 
-  const admin = admins.find(
-    (a) => a.username === username && a.password === password
-  );
+    // Cari admin di Firestore
+    const snapshot = await db.collection('admins')
+      .where('username', '==', username)
+      .get();
 
-  if (!admin) {
-    console.log(`\x1b[31m❌ Login failed: ${username}\x1b[0m`);
-    return res.status(401).json({ 
-      success: false, 
-      error: 'Username atau password salah!' 
-    });
-  }
-
-  console.log(`\x1b[38;2;255;105;180m✅ Login success: ${username}\x1b[0m`);
-  res.json({
-    success: true,
-    message: 'Login berhasil!',
-    admin: {
-      id: admin.id,
-      username: admin.username
+    if (snapshot.empty) {
+      console.log(`❌ Login failed: ${username} (not found)`);
+      return res.status(401).json({ 
+        success: false, 
+        error: 'Username atau password salah!' 
+      });
     }
-  });
+
+    const adminDoc = snapshot.docs[0];
+    const adminData = adminDoc.data();
+
+    // Verifikasi password dengan bcrypt
+    const isValid = await bcrypt.compare(password, adminData.passwordHash);
+    if (!isValid) {
+      console.log(`❌ Login failed: ${username} (wrong password)`);
+      return res.status(401).json({ 
+        success: false, 
+        error: 'Username atau password salah!' 
+      });
+    }
+
+    // Generate JWT Token
+    const token = jwt.sign(
+      { 
+        id: adminDoc.id, 
+        username: adminData.username
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: '24h' }
+    );
+
+    console.log(`✅ Login success: ${username}`);
+    res.json({
+      success: true,
+      message: 'Login berhasil!',
+      token,
+      admin: {
+        id: adminDoc.id,
+        username: adminData.username
+      }
+    });
+
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({ error: 'Terjadi kesalahan server!' });
+  }
 });
 
 // POST: Validasi Promo Code
@@ -73,14 +95,19 @@ app.post('/api/validate-promo', (req, res) => {
   const PROMO_CODE = process.env.PROMO_CODE || 'GAMER2026';
 
   if (code === PROMO_CODE) {
-    console.log(`\x1b[38;2;255;105;180m✅ Promo code valid: ${code}\x1b[0m`);
+    console.log(`✅ Promo code valid: ${code}`);
+    const token = jwt.sign(
+      { promo: true, timestamp: Date.now() },
+      process.env.JWT_SECRET,
+      { expiresIn: '5m' }
+    );
     res.json({
       success: true,
       message: 'Promo code valid!',
-      token: 'dummy_token_' + Date.now()
+      token
     });
   } else {
-    console.log(`\x1b[31m❌ Invalid promo code: ${code}\x1b[0m`);
+    console.log(`❌ Invalid promo code: ${code}`);
     res.status(401).json({
       success: false,
       error: 'Kode promo tidak valid!'
@@ -91,93 +118,214 @@ app.post('/api/validate-promo', (req, res) => {
 // ============ PRODUCTS ENDPOINTS ============
 
 // GET: Ambil semua produk
-app.get('/api/products', (req, res) => {
-  const products = readData(DATA_PATH);
-  console.log(`\x1b[38;2;255;105;180m📦 GET /api/products - ${products.length} products\x1b[0m`);
-  res.json(products);
+app.get('/api/products', async (req, res) => {
+  try {
+    const snapshot = await db.collection('products')
+      .orderBy('createdAt', 'desc')
+      .get();
+
+    const products = [];
+    snapshot.forEach(doc => {
+      products.push({ id: doc.id, ...doc.data() });
+    });
+
+    console.log(`📦 GET /api/products - ${products.length} products`);
+    res.json(products);
+
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    res.status(500).json({ error: 'Gagal mengambil produk!' });
+  }
 });
 
 // GET: Ambil produk by ID
-app.get('/api/products/:id', (req, res) => {
-  const products = readData(DATA_PATH);
-  const product = products.find(p => p.id === parseInt(req.params.id));
-  if (!product) {
-    return res.status(404).json({ error: 'Product not found' });
+app.get('/api/products/:id', async (req, res) => {
+  try {
+    const doc = await db.collection('products').doc(req.params.id).get();
+    if (!doc.exists) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+    console.log(`📦 GET /api/products/${req.params.id}`);
+    res.json({ id: doc.id, ...doc.data() });
+
+  } catch (error) {
+    console.error('Error fetching product:', error);
+    res.status(500).json({ error: 'Gagal mengambil produk!' });
   }
-  console.log(`\x1b[38;2;255;105;180m📦 GET /api/products/${req.params.id}\x1b[0m`);
-  res.json(product);
 });
 
-// POST: Tambah produk baru
-app.post('/api/products', (req, res) => {
-  const products = readData(DATA_PATH);
-  const { name, image, shopeeLink, tokopediaLink } = req.body;
+// POST: Tambah produk baru (PROTECTED)
+app.post('/api/products', verifyToken, async (req, res) => {
+  try {
+    const { name, image, shopeeLink, tokopediaLink } = req.body;
 
-  if (!name) {
-    return res.status(400).json({ error: 'Nama produk wajib diisi!' });
+    if (!name) {
+      return res.status(400).json({ error: 'Nama produk wajib diisi!' });
+    }
+    if (!shopeeLink && !tokopediaLink) {
+      return res.status(400).json({ error: 'Minimal satu link harus diisi!' });
+    }
+
+    const productData = {
+      name,
+      image: image || 'https://via.placeholder.com/300x200/9e6b54/ffffff?text=No+Image',
+      shopeeLink: shopeeLink || '',
+      tokopediaLink: tokopediaLink || '',
+      createdAt: new Date().toISOString()
+    };
+
+    const docRef = await db.collection('products').add(productData);
+    console.log(`✅ Product added: ${name}`);
+
+    res.status(201).json({ 
+      id: docRef.id, 
+      ...productData
+    });
+
+  } catch (error) {
+    console.error('Error adding product:', error);
+    res.status(500).json({ error: 'Gagal menambahkan produk!' });
   }
-  if (!shopeeLink && !tokopediaLink) {
-    return res.status(400).json({ error: 'Minimal satu link harus diisi!' });
-  }
-
-  const newProduct = {
-    id: Date.now(),
-    name,
-    image: image || 'https://via.placeholder.com/300x200/9e6b54/ffffff?text=No+Image',
-    shopeeLink: shopeeLink || '',
-    tokopediaLink: tokopediaLink || ''
-  };
-
-  products.push(newProduct);
-  writeData(DATA_PATH, products);
-  console.log(`\x1b[38;2;255;105;180m✅ Product added: ${name}\x1b[0m`);
-  res.status(201).json(newProduct);
 });
 
-// PUT: Update produk
-app.put('/api/products/:id', (req, res) => {
-  const products = readData(DATA_PATH);
-  const id = parseInt(req.params.id);
-  const { name, image, shopeeLink, tokopediaLink } = req.body;
+// PUT: Update produk (PROTECTED)
+app.put('/api/products/:id', verifyToken, async (req, res) => {
+  try {
+    const { name, image, shopeeLink, tokopediaLink } = req.body;
+    const docRef = db.collection('products').doc(req.params.id);
 
-  const index = products.findIndex(p => p.id === id);
-  if (index === -1) {
-    return res.status(404).json({ error: 'Product not found' });
+    const doc = await docRef.get();
+    if (!doc.exists) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+
+    if (!name) {
+      return res.status(400).json({ error: 'Nama produk wajib diisi!' });
+    }
+    if (!shopeeLink && !tokopediaLink) {
+      return res.status(400).json({ error: 'Minimal satu link harus diisi!' });
+    }
+
+    const updateData = {
+      name,
+      image: image || doc.data().image,
+      shopeeLink: shopeeLink || '',
+      tokopediaLink: tokopediaLink || '',
+      updatedAt: new Date().toISOString()
+    };
+
+    await docRef.update(updateData);
+    console.log(`✏️ Product updated: ${name}`);
+
+    res.json({ 
+      id: req.params.id, 
+      ...updateData
+    });
+
+  } catch (error) {
+    console.error('Error updating product:', error);
+    res.status(500).json({ error: 'Gagal mengupdate produk!' });
   }
-
-  if (!name) {
-    return res.status(400).json({ error: 'Nama produk wajib diisi!' });
-  }
-  if (!shopeeLink && !tokopediaLink) {
-    return res.status(400).json({ error: 'Minimal satu link harus diisi!' });
-  }
-
-  products[index] = {
-    ...products[index],
-    name,
-    image: image || products[index].image,
-    shopeeLink: shopeeLink || '',
-    tokopediaLink: tokopediaLink || ''
-  };
-
-  writeData(DATA_PATH, products);
-  console.log(`\x1b[38;2;255;105;180m✏️ Product updated: ${name}\x1b[0m`);
-  res.json(products[index]);
 });
 
-// DELETE: Hapus produk
-app.delete('/api/products/:id', (req, res) => {
-  const products = readData(DATA_PATH);
-  const id = parseInt(req.params.id);
-  const filtered = products.filter(p => p.id !== id);
+// DELETE: Hapus produk (PROTECTED)
+app.delete('/api/products/:id', verifyToken, async (req, res) => {
+  try {
+    const docRef = db.collection('products').doc(req.params.id);
+    const doc = await docRef.get();
 
-  if (filtered.length === products.length) {
-    return res.status(404).json({ error: 'Product not found' });
+    if (!doc.exists) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+
+    await docRef.delete();
+    console.log(`🗑️ Product deleted: ${req.params.id}`);
+
+    res.json({ message: 'Product deleted successfully' });
+
+  } catch (error) {
+    console.error('Error deleting product:', error);
+    res.status(500).json({ error: 'Gagal menghapus produk!' });
   }
+});
 
-  writeData(DATA_PATH, filtered);
-  console.log(`\x1b[38;2;255;105;180m🗑️ Product deleted: ${id}\x1b[0m`);
-  res.json({ message: 'Product deleted successfully' });
+// ============ ADMIN SETTINGS ENDPOINT ============
+
+// PUT: Update username & password
+app.put('/api/admin/settings', verifyToken, async (req, res) => {
+  try {
+    const { currentUsername, newUsername, currentPassword, newPassword } = req.body;
+    const userId = req.user.id;
+
+    // Ambil data admin dari Firestore
+    const docRef = db.collection('admins').doc(userId);
+    const doc = await docRef.get();
+
+    if (!doc.exists) {
+      return res.status(404).json({ error: 'Admin not found' });
+    }
+
+    const adminData = doc.data();
+
+    // Verifikasi password lama
+    const isValid = await bcrypt.compare(currentPassword, adminData.passwordHash);
+    if (!isValid) {
+      return res.status(401).json({ error: 'Password lama salah!' });
+    }
+
+    const updateData = {};
+
+    // Update username
+    if (newUsername) {
+      // Cek apakah username baru sudah dipakai
+      const existing = await db.collection('admins')
+        .where('username', '==', newUsername)
+        .get();
+
+      if (!existing.empty) {
+        return res.status(400).json({ error: 'Username sudah digunakan!' });
+      }
+
+      updateData.username = newUsername;
+    }
+
+    // Update password
+    if (newPassword) {
+      updateData.passwordHash = await bcrypt.hash(newPassword, 10);
+    }
+
+    // Kalo ga ada yang diubah
+    if (Object.keys(updateData).length === 0) {
+      return res.status(400).json({ error: 'Tidak ada perubahan!' });
+    }
+
+    // Update ke Firestore
+    await docRef.update({
+      ...updateData,
+      updatedAt: new Date().toISOString()
+    });
+
+    // Generate token baru kalo username berubah
+    let newToken = null;
+    if (newUsername) {
+      newToken = jwt.sign(
+        { id: userId, username: newUsername },
+        process.env.JWT_SECRET,
+        { expiresIn: '24h' }
+      );
+    }
+
+    console.log(`✏️ Admin settings updated: ${adminData.username} → ${newUsername || adminData.username}`);
+    res.json({
+      success: true,
+      message: 'Settings updated successfully!',
+      token: newToken
+    });
+
+  } catch (error) {
+    console.error('Error updating settings:', error);
+    res.status(500).json({ error: 'Gagal update settings!' });
+  }
 });
 
 // ============ START SERVER ============
@@ -186,8 +334,9 @@ app.listen(PORT, () => {
 
   console.log('\x1b[38;2;255;105;180m═══════════════════════════════════════════════════════════════════');
   console.log('  Server is running!');
-  console.log(`  http://localhost:${PORT}`);
-  console.log('═══════════════════════════════════════════════════════════════════\x1b[0m');
+  console.log('\x1b[38;2;255;105;180m  🔥 Firebase Connected!\x1b[0m');
+  console.log(`\x1b[38;2;255;105;180m  http://localhost:${PORT}\x1b[0m`);
+  console.log('\x1b[38;2;255;105;180m═══════════════════════════════════════════════════════════════════');
 
   console.log('\x1b[38;2;255;105;180m');
   console.log('   ██████╗  █████╗ ███╗   ███╗███████╗███████╗');

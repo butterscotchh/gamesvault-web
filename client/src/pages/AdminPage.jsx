@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Plus, Trash2, Edit, X, Save } from 'lucide-react';
+import { Plus, Trash2, Edit, X, Save, Home } from 'lucide-react';
 import api from '../api/axios';
 import toast from 'react-hot-toast';
 
@@ -143,12 +143,27 @@ const AdminPage = () => {
             <span className="text-xl font-bold text-brick-700">Admin Panel</span>
             <span className="text-sm text-gray-500 hidden sm:inline">| Manage Products</span>
           </div>
-          <button
-            onClick={handleLogout}
-            className="px-4 py-2 text-sm text-red-600 hover:text-red-700 font-medium"
-          >
-            Logout
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => navigate('/')}
+              className="px-4 py-2 text-sm text-gray-600 hover:text-brick-600 font-medium transition flex items-center gap-1"
+            >
+              <Home className="w-4 h-4" />
+              Home
+            </button>
+            <button
+              onClick={() => navigate('/admin/settings')}
+              className="px-4 py-2 text-sm text-gray-600 hover:text-brick-600 font-medium transition"
+            >
+              Settings
+            </button>
+            <button
+              onClick={handleLogout}
+              className="px-4 py-2 text-sm text-red-600 hover:text-red-700 font-medium"
+            >
+              Logout
+            </button>
+          </div>
         </div>
       </nav>
 

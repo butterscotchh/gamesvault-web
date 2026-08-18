@@ -19,34 +19,35 @@ PROJECT STRUCTURE
 project-root/
 ├── client/                              # Frontend React
 │   ├── public/
-│   │   └── images/                      # Product images
+│   │   ├── images/                      # Product images
+│   │   └── models/                      # 3D .glb files (nanti diisi)
 │   ├── src/
 │   │   ├── api/
-│   │   │   └── axios.js                # ✅ Axios + JWT interceptor
+│   │   │   ├── axios.js                # ✅ Axios + JWT interceptor + publicApi
+│   │   │   └── firebase.js             # ⏳ NANTI (upload gambar)
 │   │   ├── assets/                      # 📁 Kosong
 │   │   ├── components/
 │   │   │   ├── 3D/
 │   │   │   │   ├── HandheldShowcase.jsx    # ✅ DONE (CP-3)
 │   │   │   │   └── DeviceModel.jsx         # ✅ DONE (CP-3)
 │   │   │   ├── carousel/
-│   │   │   │   ├── ProductCarousel.jsx    # ✅ DONE (CP-4)
+│   │   │   │   ├── ProductCarousel.jsx    # ✅ DONE (CP-4) + publicApi
 │   │   │   │   └── ProductCard.jsx        # ✅ DONE (CP-4)
-│   │   │   ├── admin/                     # ⏳ BELUM (CP-6)
-│   │   │   │   ├── AdminPanel.jsx
-│   │   │   │   └── ProductForm.jsx
+│   │   │   ├── admin/
+│   │   │   │   ├── AdminPanel.jsx         # ✅ DONE (CP-6) + Home button
+│   │   │   │   └── ProductForm.jsx        # ✅ DONE (CP-6)
 │   │   │   ├── common/
-│   │   │   │   ├── Navbar.jsx             # ✅ DONE (CP-2)
+│   │   │   │   ├── Navbar.jsx             # ✅ DONE (CP-2) + conditional admin
 │   │   │   │   ├── Footer.jsx             # ✅ DONE (CP-2)
 │   │   │   │   └── ColorPicker.jsx        # ✅ DONE (CP-3)
 │   │   │   └── login/
-│   │   │       └── LoginPage.jsx          # ✅ DONE (CP-5)
+│   │   │       └── LoginPage.jsx          # ✅ DONE (CP-5) + publicApi
 │   │   ├── context/
 │   │   │   └── AuthContext.jsx            # ✅ DONE
-│   │   ├── data/
-│   │   │   └── dummyProducts.js           # ✅ DONE (CP-4)
 │   │   ├── pages/
 │   │   │   ├── MainPage.jsx               # ✅ DONE (Hero + 3D + Carousel)
-│   │   │   └── AdminPage.jsx              # ⏳ BELUM (CP-6)
+│   │   │   ├── AdminPage.jsx              # ✅ DONE (CP-6)
+│   │   │   └── AdminSettings.jsx          # ✅ DONE (CP-7) + clean navbar
 │   │   ├── App.jsx                        # ✅ DONE
 │   │   ├── main.jsx                       # ✅ DONE
 │   │   └── index.css                      # ✅ CLEAN
@@ -57,15 +58,21 @@ project-root/
 │   ├── postcss.config.js                  # ✅ DONE
 │   └── .env                               # ✅ DONE
 │
-└── server/                                # ⏳ BELUM (CP-7)
+└── server/                                # ✅ DONE (CP-7)
     ├── src/
-    │   └── server.js
-    ├── .env
-    └── package.json
+    │   ├── server.js                      # ✅ DONE (Firebase + JWT + Settings)
+    │   └── firebase.js                    # ✅ DONE (Firebase Admin)
+    ├── data/                              # ❌ DELETED (pake Firestore)
+    ├── .env                               # ✅ DONE
+    ├── package.json                       # ✅ DONE
+    ├── serviceAccountKey.json             # ✅ DONE
+    ├── seed-admin.js                      # ✅ DONE
+    ├── add-admin.js                       # ✅ DONE
+    └── test-firebase.js                   # ❌ DELETED
 
 
-USER FLOW
----------
+USER FLOW (FINAL)
+-----------------
 1. Main Page (/)
 User buka website
   ↓
@@ -73,34 +80,42 @@ Hero Section (judul + tagline)
   ↓
 3D Showcase (5 device dengan color picker)
   ↓
-Scroll → Lihat Product Carousel
+Scroll → Lihat Product Carousel (data dari Firestore)
   ↓
 Setiap card: Nama Product + Tombol Shopee/Tokopedia (dinamis sesuai link)
   ↓
-Navbar: [Logo] [PROMO CODE: _______] [REDEEM] [Logout]
+Navbar: [Logo] [PROMO CODE: _______] [REDEEM] (hanya di non-admin page)
 
-2. Admin Access Flow (HIDDEN)
-Input promo code di navbar "GAMER2026" (dummy)
+2. Admin Access Flow (HIDDEN - JWT)
+Input promo code di navbar "GAMER2026"
   ↓
-Klik REDEEM → Validasi (sementara di frontend)
+Klik REDEEM → POST /api/validate-promo (publicApi)
+  ↓
+Cek token di localStorage → kalo valid langsung /admin
   ↓
 Valid? → Redirect ke /login
 Invalid? → Toast error
   ↓
 Halaman Login (/login) - TIDAK ADA TOMBOL LOGIN DI NAVBAR
   ↓
-Input Username & Password (dummy: admin/admin123)
+Input Username & Password
   ↓
-Valid? → Redirect ke /admin
+POST /api/login → Cek di Firestore "admins" (bcrypt)
+  ↓
+Valid? → Generate JWT → Redirect /admin
 Invalid? → Toast error
   ↓
-Admin Panel (/admin) - Protected
+Admin Panel (/admin) - Protected (verifyToken)
   ↓
-Fitur: Tambah Product (Nama, Gambar, Link Shopee/Tokopedia)
+Navbar Admin: [Admin Panel] [Home] [Settings] [Logout]
   ↓
-Fitur: List Products + Delete
+Fitur: Tambah Product (Nama, Gambar URL, Link Shopee/Tokopedia)
   ↓
-Logout → Redirect ke /
+Fitur: List Products + Edit + Delete (semua ke Firestore)
+  ↓
+Fitur: Settings (ganti username/password) + back button
+  ↓
+Logout → Hapus JWT → Redirect /
 
 3. Carousel Flow
 4 Products per slide (grid 2x2 mobile, 4x1 desktop)
@@ -114,26 +129,29 @@ Auto-slide setiap 5 detik
 Indicator dots di bawah
 
 
-API ENDPOINTS (RENCANA)
------------------------
-Method  Endpoint                  Auth     Deskripsi
-POST    /api/validate-promo       Public   Validasi promo code
-POST    /api/login                Public   Login admin → return JWT
-GET     /api/products             Public   Ambil semua products
-POST    /api/products             JWT      Tambah product
-DELETE  /api/products/:id         JWT      Hapus product
+API ENDPOINTS (FINAL)
+---------------------
+Method  Endpoint                  Auth     Instance   Deskripsi
+POST    /api/validate-promo       Public   publicApi  Validasi promo code
+POST    /api/login                Public   publicApi  Login admin → return JWT
+GET     /api/products             Public   publicApi  Ambil semua products
+GET     /api/products/:id         Public   publicApi  Ambil product by ID
+POST    /api/products             JWT      api        Tambah product
+PUT     /api/products/:id         JWT      api        Update product
+DELETE  /api/products/:id         JWT      api        Hapus product
+PUT     /api/admin/settings       JWT      api        Update username/password
 
 
-FIRESTORE DATA STRUCTURE (RENCANA)
-----------------------------------
+FIRESTORE DATA STRUCTURE (FINAL)
+--------------------------------
 Collection: products
 {
   id: "auto-generated",
   name: "PSP 3000",                    // Wajib
-  imageUrl: "https://firebase...",      // Wajib
+  image: "https://...",                 // Wajib (URL)
   shopeeLink: "https://...",            // Opsional
   tokopediaLink: "https://...",         // Opsional
-  createdAt: timestamp
+  createdAt: "2026-08-14T..."
 }
 Aturan: Minimal satu link harus diisi
 
@@ -141,8 +159,8 @@ Collection: admins
 {
   id: "auto-generated",
   username: "admin",
-  passwordHash: "$2b$10$...",
-  createdAt: timestamp
+  passwordHash: "$2b$10$...",           // bcrypt hash
+  createdAt: "2026-08-14T..."
 }
 
 
@@ -159,81 +177,99 @@ Navbar         | White + border bottom
 Buttons        | Brick accent + hover
 
 
-TECH STACK
-----------
+TECH STACK (FINAL)
+------------------
 Frontend:
-- React 18
-- Vite
-- Tailwind CSS
-- React Router DOM
-- Axios
-- Framer Motion
-- Lucide React
-- React Hot Toast
-- React Three Fiber + Three.js ✅
+- React 18.2.0
+- Vite 5.0.8
+- Tailwind CSS 3.4.0
+- React Router DOM 6.22.0
+- Axios 1.6.7 (dengan publicApi & interceptor)
+- Framer Motion 11.0.0
+- Lucide React 0.344.0
+- React Hot Toast 2.4.1
+- React Three Fiber 8.15.0
+- React Three Drei 9.88.0
+- Three.js 0.160.0
 
-Backend (RENCANA):
-- Node.js + Express
-- JWT
-- Bcrypt
-- Firebase Admin SDK
-- Express Rate Limit
+Backend:
+- Node.js (Express 4.19.2)
+- JSON Web Token (jsonwebtoken 9.0.2)
+- Bcrypt 5.1.1 (password hashing)
+- Firebase Admin SDK 12.3.0
+- CORS 2.8.5
+- Dotenv 16.4.5
+
+Database:
+- Firebase Firestore (NoSQL Cloud Database)
+
+Deployment:
+- Vercel (Frontend + Backend Serverless Functions)
 
 
-ENVIRONMENT VARIABLES
----------------------
+ENVIRONMENT VARIABLES (FINAL)
+-----------------------------
 client/.env
 VITE_API_URL=http://localhost:5000/api
 
 server/.env
 PORT=5000
-JWT_SECRET=your_jwt_secret_key_here
+JWT_SECRET=gamesvault_super_secret_key_2026
 PROMO_CODE=GAMER2026
 
-# Firebase Admin SDK
-FIREBASE_PROJECT_ID=your-project-id
-FIREBASE_PRIVATE_KEY=your-private-key
-FIREBASE_CLIENT_EMAIL=your-client-email
+# Firebase Admin SDK (optional, bisa pake serviceAccountKey.json)
+FIREBASE_PROJECT_ID=gamesvault-web
+FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
+FIREBASE_CLIENT_EMAIL=firebase-adminsdk-xxx@gamesvault-web.iam.gserviceaccount.com
 
 
-PROGRESS STATUS
----------------
+PROGRESS STATUS (FINAL)
+-----------------------
 CP-1: Setup Project                    ✅ DONE
 CP-2: Navbar + Footer                  ✅ DONE
 CP-3: 3D Showcase + Color Picker       ✅ DONE
 CP-4: Product Carousel                 ✅ DONE
-CP-5: Login Page (dummy auth)          ✅ DONE
-CP-6: Admin Panel                      ⏳ BELUM (NEXT)
-CP-7: Backend + Firebase               ⏳ BELUM
-CP-8: Polish + Deploy                  ⏳ BELUM
+CP-5: Login Page                       ✅ DONE
+CP-6: Admin Panel + CRUD               ✅ DONE
+CP-7: Backend + Firebase + JWT         ✅ DONE
+CP-8: Polish (Frontend Final Touch)    ⏳ NEXT
+CP-9: Deploy to Vercel                 ⏳ BELUM
 
 
-FEATURE LIST
-------------
+FEATURE LIST (FINAL)
+--------------------
 Frontend:
 - [x] Setup Project (CP-1)
 - [x] Navbar + Footer + Promo Code Form (CP-2)
 - [x] 3D Showcase + Color Picker (CP-3)
 - [x] Product Carousel 4/slide (CP-4)
-- [x] Login Page (CP-5) - DUMMY AUTH
-- [ ] Admin Panel + Upload Gambar (CP-6)
-- [ ] Polish + Deploy (CP-8)
+- [x] Login Page (CP-5)
+- [x] Admin Panel + CRUD (CP-6)
+- [x] Admin Settings (ganti username/password) (CP-7)
+- [x] publicApi & protected routes (CP-7)
+- [x] Conditional Navbar (admin/home) (CP-7)
+- [ ] Polish & Responsive (CP-8)
 
-Backend (RENCANA):
-- [ ] JWT authentication (CP-7)
-- [ ] Firebase Firestore integration (CP-7)
-- [ ] CRUD products with upload (CP-7)
+Backend:
+- [x] Express server (CP-7)
+- [x] JWT authentication (CP-7)
+- [x] Firebase Firestore integration (CP-7)
+- [x] CRUD products (CP-7)
+- [x] Bcrypt password hashing (CP-7)
+- [x] Admin settings endpoint (CP-7)
 
 Security:
-- [ ] Promo code static di .env
-- [ ] Admin credentials di Firestore
-- [ ] JWT expires in 24 hours
+- [x] Promo code static di .env
+- [x] Admin credentials di Firestore (bcrypt)
+- [x] JWT expires in 24 hours
+- [x] Protected routes (verifyToken middleware)
+- [x] Public routes ga pake token (publicApi)
 
 
-DEPLOYMENT PLAN
----------------
+DEPLOYMENT PLAN (CP-9)
+----------------------
 Service    | Untuk
-Vercel     | Frontend + Backend (serverless)
+Vercel     | Frontend + Backend (serverless functions)
 Firebase   | Firestore Database
 
 Vercel Setup:
@@ -242,19 +278,70 @@ Vercel Setup:
 3. Deploy otomatis setiap push ke main branch
 
 
-NOTES
------
+GUIDE: MENAMBAHKAN 3D MODEL ASSETS
+----------------------------------
+1. Format yang didukung:
+   - .glb (GLTF Binary) - REKOMENDASI
+   - .gltf (GLTF JSON) + texture folder
+
+2. Sumber Model 3D Gratis:
+   - Sketchfab (filter by "Free Download")
+   - Poly Haven
+   - TurboSquid (free section)
+   - CGTrader (free section)
+
+3. Cara Menambahkan:
+   a. Download file .glb
+   b. Masukkan ke folder: client/public/models/
+   c. Update DeviceModel.jsx:
+
+   // Tambahkan case baru
+   case 'NamaDevice':
+     return (
+       <group position={position}>
+         <primitive 
+           object={useGLTF('/models/nama-file.glb').scene} 
+           scale={[0.5, 0.5, 0.5]} // Sesuaikan ukuran
+         />
+         <meshStandardMaterial color={color} />
+       </group>
+     );
+
+   d. Tambahkan device ke array di HandheldShowcase.jsx:
+   const devices = ['PSP', 'DS Lite', 'PS Vita', '3DS', '2DS', 'NamaDevice'];
+
+4. Tips Optimasi:
+   - Kompres model dengan Draco compression
+   - Gunakan meshoptimizer untuk ukuran lebih kecil
+   - Pastikan texture resolution tidak terlalu besar (max 1024x1024)
+
+5. Contoh Kode Lengkap:
+   import { useGLTF } from '@react-three/drei';
+   ...
+   case 'NamaDevice':
+     const { scene } = useGLTF('/models/nama-file.glb');
+     return (
+       <group position={position}>
+         <primitive object={scene} scale={[0.5, 0.5, 0.5]} />
+       </group>
+     );
+
+
+NOTES (UPDATED)
+---------------
 3D Models:
 - Format: .glb (GLTF binary)
 - Letakkan di: client/public/models/
 - Sementara: pakai geometry shapes (box/sphere) - SUDAH JALAN
+- Bisa diganti dengan model .glb kapan saja (lihat guide di atas)
 
-Login Credentials (DUMMY - CP-5):
+Login Credentials (FIRESTORE):
 - Username: admin
 - Password: admin123
+- Bisa tambah admin baru via script add-admin.js
 
-Promo Code (DUMMY):
-- Kode: GAMER2026
+Promo Code:
+- Kode: GAMER2026 (ada di .env)
 
 Product Validation:
 - Nama produk: Wajib
@@ -262,30 +349,50 @@ Product Validation:
 - Link Tokopedia: Opsional
 - Minimal salah satu link harus diisi
 
+Data Source:
+- ✅ Semua data produk dari Firestore (bukan JSON/dummy)
+- ✅ Admin credentials dari Firestore (bukan JSON/dummy)
+- ✅ Authentication pake JWT (bukan dummy)
 
-DEVELOPMENT PHASES
-------------------
-Phase 1: Frontend (Client) - ✅ 80% DONE
+Public & Protected Routes:
+- ✅ Public: /validate-promo, /login, /products (GET) → publicApi
+- ✅ Protected: /products (POST/PUT/DELETE), /admin/settings → api (JWT)
+
+
+DEVELOPMENT PHASES (FINAL)
+--------------------------
+Phase 1: Frontend (Client) - ✅ DONE
 - [x] Setup Vite + React + Tailwind (CP-1)
 - [x] Navbar + Footer (CP-2)
 - [x] 3D Showcase + Color Picker (CP-3)
 - [x] Product Carousel (CP-4)
 - [x] Login Page (CP-5)
-- [ ] Admin Panel (CP-6)
+- [x] Admin Panel + CRUD (CP-6)
+- [x] Admin Settings (CP-7)
 
-Phase 2: Backend (Server) - ⏳ BELUM
-- [ ] Setup Express + Firebase Admin (CP-7)
-- [ ] JWT authentication (CP-7)
-- [ ] CRUD products (CP-7)
+Phase 2: Backend (Server) - ✅ DONE
+- [x] Setup Express + Firebase Admin (CP-7)
+- [x] JWT authentication (CP-7)
+- [x] CRUD products (CP-7)
+- [x] Admin settings (CP-7)
 
-Phase 3: Integration - ⏳ BELUM
-- [ ] Connect frontend to API (CP-7)
-- [ ] Protected routes (CP-7)
+Phase 3: Integration - ✅ DONE
+- [x] Connect frontend to API (CP-7)
+- [x] Protected routes (CP-7)
+- [x] Firebase Firestore (CP-7)
+- [x] publicApi & conditional navbar (CP-7)
 
-Phase 4: Deployment - ⏳ BELUM
-- [ ] Deploy to Vercel (CP-8)
-- [ ] Setup Firebase (CP-8)
+Phase 4: Polish - ⏳ NEXT (CP-8)
+- [ ] Responsive design (mobile/tablet)
+- [ ] Loading states
+- [ ] Error handling
+- [ ] UI/UX final touch
+
+Phase 5: Deployment - ⏳ BELUM (CP-9)
+- [ ] Deploy to Vercel
+- [ ] Environment Variables
+- [ ] Production testing
 
 
-Status: Development (CP-5 Done, CP-6 Next)
-Last Updated: 2026-08-14
+Status: Development (CP-7 Done, CP-8 Next)
+Last Updated: 2026-08-18

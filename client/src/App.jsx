@@ -4,8 +4,8 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import MainPage from './pages/MainPage';
 import LoginPage from './components/login/LoginPage';
 import AdminPage from './pages/AdminPage';
+import AdminSettings from './pages/AdminSettings';  // ← IMPORT BARU
 
-// Protected Route Component
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
   
@@ -30,6 +30,14 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <AdminPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/settings"
+        element={
+          <ProtectedRoute>
+            <AdminSettings />
           </ProtectedRoute>
         }
       />

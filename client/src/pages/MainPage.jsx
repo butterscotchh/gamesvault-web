@@ -1,6 +1,7 @@
 import Navbar from '../components/common/Navbar';
 import Footer from '../components/common/Footer';
 import ProductCarousel from '../components/carousel/ProductCarousel';
+import HandheldShowcase from '../components/3D/HandheldShowcase';
 
 const MainPage = () => {
   return (
@@ -19,6 +20,9 @@ const MainPage = () => {
             </p>
           </div>
         </section>
+
+        {/* 3D Showcase */}
+        <HandheldShowcase />
 
         {/* Product Carousel */}
         <section className="py-16">

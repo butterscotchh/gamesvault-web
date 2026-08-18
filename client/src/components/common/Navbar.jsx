@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Gamepad2, Shield } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import api from '../../api/axios';
+import { publicApi } from '../../api/axios';
 import toast from 'react-hot-toast';
 
 const Navbar = () => {
@@ -10,6 +10,10 @@ const Navbar = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Cek apakah di halaman admin
+  const isAdminPage = location.pathname.startsWith('/admin');
 
   const handleRedeem = async (e) => {
     e.preventDefault();
@@ -20,8 +24,27 @@ const Navbar = () => {
 
     setIsLoading(true);
     try {
-      const response = await api.post('/validate-promo', {
-        code: promoCode.trim()
+      const existingToken = localStorage.getItem('adminToken');
+      
+      if (existingToken) {
+        try {
+          const payload = JSON.parse(atob(existingToken.split('.')[1]));
+          const isExpired = payload.exp * 1000 < Date.now();
+          
+          if (!isExpired) {
+            toast.success('Session masih aktif! Redirecting...');
+            setTimeout(() => navigate('/admin'), 1000);
+            setIsLoading(false);
+            setPromoCode('');
+            return;
+          }
+        } catch (error) {
+          console.log('Token invalid, proceed to login');
+        }
+      }
+
+      const response = await publicApi.post('/validate-promo', { 
+        code: promoCode.trim() 
       });
 
       if (response.data.success) {
@@ -29,8 +52,8 @@ const Navbar = () => {
         localStorage.setItem('promoToken', response.data.token);
         setTimeout(() => navigate('/login'), 1000);
       }
+
     } catch (error) {
-      console.error('Promo error:', error);
       toast.error(error.response?.data?.error || 'Kode promo tidak valid!');
     } finally {
       setIsLoading(false);
@@ -56,31 +79,33 @@ const Navbar = () => {
             </span>
           </div>
 
-          {/* Promo Code Form */}
-          <form onSubmit={handleRedeem} className="flex items-center gap-2 flex-1 max-w-md mx-4">
-            <div className="relative flex-1">
-              <Shield className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <input
-                type="text"
-                value={promoCode}
-                onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
-                placeholder="PROMO CODE"
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brick-500 focus:border-transparent text-sm uppercase"
+          {/* Promo Code Form - HIDE di halaman admin */}
+          {!isAdminPage && (
+            <form onSubmit={handleRedeem} className="flex items-center gap-2 flex-1 max-w-md mx-4">
+              <div className="relative flex-1">
+                <Shield className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input
+                  type="text"
+                  value={promoCode}
+                  onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+                  placeholder="PROMO CODE"
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brick-500 focus:border-transparent text-sm uppercase"
+                  disabled={isLoading}
+                />
+              </div>
+              <button
+                type="submit"
                 disabled={isLoading}
-              />
-            </div>
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="px-4 py-2 bg-brick-600 text-white rounded-lg hover:bg-brick-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium whitespace-nowrap"
-            >
-              {isLoading ? '...' : 'REDEEM'}
-            </button>
-          </form>
+                className="px-4 py-2 bg-brick-600 text-white rounded-lg hover:bg-brick-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium whitespace-nowrap"
+              >
+                {isLoading ? '...' : 'REDEEM'}
+              </button>
+            </form>
+          )}
 
-          {/* Right Side - Logout */}
+          {/* Right Side - HANYA di halaman admin */}
           <div className="flex items-center gap-3 shrink-0">
-            {isAuthenticated && (
+            {isAdminPage && isAuthenticated && (
               <>
                 <span className="text-sm text-gray-600 hidden sm:inline">Admin</span>
                 <button
