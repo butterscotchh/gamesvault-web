@@ -335,7 +335,7 @@ app.listen(PORT, () => {
   console.log('\x1b[38;2;255;105;180m═══════════════════════════════════════════════════════════════════');
   console.log('  Server is running!');
   console.log('\x1b[38;2;255;105;180m  🔥 Firebase Connected!\x1b[0m');
-  console.log(`\x1b[38;2;255;105;180m http://localhost:${PORT}\x1b[0m`);
+  console.log(`\x1b[38;2;255;105;180m  http://localhost:${PORT}\x1b[0m`);
   console.log('\x1b[38;2;255;105;180m═══════════════════════════════════════════════════════════════════');
 
   console.log('\x1b[38;2;255;105;180m');
