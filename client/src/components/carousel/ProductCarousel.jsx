@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import ProductCard from './ProductCard';
-import api from '../../api/axios';
+import { publicApi } from '../../api/axios';
 
 const ProductCarousel = () => {
   const [products, setProducts] = useState([]);
@@ -9,10 +9,11 @@ const ProductCarousel = () => {
   const [loading, setLoading] = useState(true);
   const itemsPerPage = 4;
 
+  // Load dari API (public, ga pake token)
   useEffect(() => {
     const loadProducts = async () => {
       try {
-        const response = await api.get('/products');
+        const response = await publicApi.get('/products');
         setProducts(response.data);
       } catch (error) {
         console.error('Error loading products:', error);

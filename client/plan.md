@@ -23,30 +23,31 @@ project-root/
 │   │   └── models/                      # 3D .glb files (nanti diisi)
 │   ├── src/
 │   │   ├── api/
-│   │   │   └── axios.js                # ✅ Axios + JWT interceptor
+│   │   │   ├── axios.js                # ✅ Axios + JWT interceptor + publicApi
+│   │   │   └── firebase.js             # ⏳ NANTI (upload gambar)
 │   │   ├── assets/                      # 📁 Kosong
 │   │   ├── components/
 │   │   │   ├── 3D/
 │   │   │   │   ├── HandheldShowcase.jsx    # ✅ DONE (CP-3)
 │   │   │   │   └── DeviceModel.jsx         # ✅ DONE (CP-3)
 │   │   │   ├── carousel/
-│   │   │   │   ├── ProductCarousel.jsx    # ✅ DONE (CP-4)
+│   │   │   │   ├── ProductCarousel.jsx    # ✅ DONE (CP-4) + publicApi
 │   │   │   │   └── ProductCard.jsx        # ✅ DONE (CP-4)
 │   │   │   ├── admin/
-│   │   │   │   ├── AdminPanel.jsx         # ✅ DONE (CP-6)
+│   │   │   │   ├── AdminPanel.jsx         # ✅ DONE (CP-6) + Home button
 │   │   │   │   └── ProductForm.jsx        # ✅ DONE (CP-6)
 │   │   │   ├── common/
-│   │   │   │   ├── Navbar.jsx             # ✅ DONE (CP-2)
+│   │   │   │   ├── Navbar.jsx             # ✅ DONE (CP-2) + conditional admin
 │   │   │   │   ├── Footer.jsx             # ✅ DONE (CP-2)
 │   │   │   │   └── ColorPicker.jsx        # ✅ DONE (CP-3)
 │   │   │   └── login/
-│   │   │       └── LoginPage.jsx          # ✅ DONE (CP-5)
+│   │   │       └── LoginPage.jsx          # ✅ DONE (CP-5) + publicApi
 │   │   ├── context/
 │   │   │   └── AuthContext.jsx            # ✅ DONE
 │   │   ├── pages/
 │   │   │   ├── MainPage.jsx               # ✅ DONE (Hero + 3D + Carousel)
 │   │   │   ├── AdminPage.jsx              # ✅ DONE (CP-6)
-│   │   │   └── AdminSettings.jsx          # ✅ DONE (CP-7)
+│   │   │   └── AdminSettings.jsx          # ✅ DONE (CP-7) + clean navbar
 │   │   ├── App.jsx                        # ✅ DONE
 │   │   ├── main.jsx                       # ✅ DONE
 │   │   └── index.css                      # ✅ CLEAN
@@ -59,7 +60,7 @@ project-root/
 │
 └── server/                                # ✅ DONE (CP-7)
     ├── src/
-    │   ├── server.js                      # ✅ DONE (Firebase + JWT)
+    │   ├── server.js                      # ✅ DONE (Firebase + JWT + Settings)
     │   └── firebase.js                    # ✅ DONE (Firebase Admin)
     ├── data/                              # ❌ DELETED (pake Firestore)
     ├── .env                               # ✅ DONE
@@ -70,8 +71,8 @@ project-root/
     └── test-firebase.js                   # ❌ DELETED
 
 
-USER FLOW (UPDATE)
-------------------
+USER FLOW (FINAL)
+-----------------
 1. Main Page (/)
 User buka website
   ↓
@@ -83,12 +84,14 @@ Scroll → Lihat Product Carousel (data dari Firestore)
   ↓
 Setiap card: Nama Product + Tombol Shopee/Tokopedia (dinamis sesuai link)
   ↓
-Navbar: [Logo] [PROMO CODE: _______] [REDEEM] [Logout]
+Navbar: [Logo] [PROMO CODE: _______] [REDEEM] (hanya di non-admin page)
 
 2. Admin Access Flow (HIDDEN - JWT)
 Input promo code di navbar "GAMER2026"
   ↓
-Klik REDEEM → POST /api/validate-promo
+Klik REDEEM → POST /api/validate-promo (publicApi)
+  ↓
+Cek token di localStorage → kalo valid langsung /admin
   ↓
 Valid? → Redirect ke /login
 Invalid? → Toast error
@@ -104,11 +107,13 @@ Invalid? → Toast error
   ↓
 Admin Panel (/admin) - Protected (verifyToken)
   ↓
+Navbar Admin: [Admin Panel] [Home] [Settings] [Logout]
+  ↓
 Fitur: Tambah Product (Nama, Gambar URL, Link Shopee/Tokopedia)
   ↓
 Fitur: List Products + Edit + Delete (semua ke Firestore)
   ↓
-Fitur: Settings (ganti username/password)
+Fitur: Settings (ganti username/password) + back button
   ↓
 Logout → Hapus JWT → Redirect /
 
@@ -126,15 +131,15 @@ Indicator dots di bawah
 
 API ENDPOINTS (FINAL)
 ---------------------
-Method  Endpoint                  Auth     Deskripsi
-POST    /api/validate-promo       Public   Validasi promo code → return JWT
-POST    /api/login                Public   Login admin → return JWT
-GET     /api/products             Public   Ambil semua products (dari Firestore)
-GET     /api/products/:id         Public   Ambil product by ID
-POST    /api/products             JWT      Tambah product (ke Firestore)
-PUT     /api/products/:id         JWT      Update product (di Firestore)
-DELETE  /api/products/:id         JWT      Hapus product (dari Firestore)
-PUT     /api/admin/settings       JWT      Update username/password admin
+Method  Endpoint                  Auth     Instance   Deskripsi
+POST    /api/validate-promo       Public   publicApi  Validasi promo code
+POST    /api/login                Public   publicApi  Login admin → return JWT
+GET     /api/products             Public   publicApi  Ambil semua products
+GET     /api/products/:id         Public   publicApi  Ambil product by ID
+POST    /api/products             JWT      api        Tambah product
+PUT     /api/products/:id         JWT      api        Update product
+DELETE  /api/products/:id         JWT      api        Hapus product
+PUT     /api/admin/settings       JWT      api        Update username/password
 
 
 FIRESTORE DATA STRUCTURE (FINAL)
@@ -143,7 +148,7 @@ Collection: products
 {
   id: "auto-generated",
   name: "PSP 3000",                    // Wajib
-  image: "https://via.placeholder.com/...", // Wajib (URL)
+  image: "https://...",                 // Wajib (URL)
   shopeeLink: "https://...",            // Opsional
   tokopediaLink: "https://...",         // Opsional
   createdAt: "2026-08-14T..."
@@ -179,7 +184,7 @@ Frontend:
 - Vite 5.0.8
 - Tailwind CSS 3.4.0
 - React Router DOM 6.22.0
-- Axios 1.6.7
+- Axios 1.6.7 (dengan publicApi & interceptor)
 - Framer Motion 11.0.0
 - Lucide React 0.344.0
 - React Hot Toast 2.4.1
@@ -227,7 +232,8 @@ CP-4: Product Carousel                 ✅ DONE
 CP-5: Login Page                       ✅ DONE
 CP-6: Admin Panel + CRUD               ✅ DONE
 CP-7: Backend + Firebase + JWT         ✅ DONE
-CP-8: Polish + Deploy                  ⏳ NEXT
+CP-8: Polish (Frontend Final Touch)    ⏳ NEXT
+CP-9: Deploy to Vercel                 ⏳ BELUM
 
 
 FEATURE LIST (FINAL)
@@ -240,7 +246,9 @@ Frontend:
 - [x] Login Page (CP-5)
 - [x] Admin Panel + CRUD (CP-6)
 - [x] Admin Settings (ganti username/password) (CP-7)
-- [ ] Polish + Deploy (CP-8)
+- [x] publicApi & protected routes (CP-7)
+- [x] Conditional Navbar (admin/home) (CP-7)
+- [ ] Polish & Responsive (CP-8)
 
 Backend:
 - [x] Express server (CP-7)
@@ -255,10 +263,11 @@ Security:
 - [x] Admin credentials di Firestore (bcrypt)
 - [x] JWT expires in 24 hours
 - [x] Protected routes (verifyToken middleware)
+- [x] Public routes ga pake token (publicApi)
 
 
-DEPLOYMENT PLAN
----------------
+DEPLOYMENT PLAN (CP-9)
+----------------------
 Service    | Untuk
 Vercel     | Frontend + Backend (serverless functions)
 Firebase   | Firestore Database
@@ -345,6 +354,10 @@ Data Source:
 - ✅ Admin credentials dari Firestore (bukan JSON/dummy)
 - ✅ Authentication pake JWT (bukan dummy)
 
+Public & Protected Routes:
+- ✅ Public: /validate-promo, /login, /products (GET) → publicApi
+- ✅ Protected: /products (POST/PUT/DELETE), /admin/settings → api (JWT)
+
 
 DEVELOPMENT PHASES (FINAL)
 --------------------------
@@ -354,7 +367,8 @@ Phase 1: Frontend (Client) - ✅ DONE
 - [x] 3D Showcase + Color Picker (CP-3)
 - [x] Product Carousel (CP-4)
 - [x] Login Page (CP-5)
-- [x] Admin Panel (CP-6)
+- [x] Admin Panel + CRUD (CP-6)
+- [x] Admin Settings (CP-7)
 
 Phase 2: Backend (Server) - ✅ DONE
 - [x] Setup Express + Firebase Admin (CP-7)
@@ -366,13 +380,19 @@ Phase 3: Integration - ✅ DONE
 - [x] Connect frontend to API (CP-7)
 - [x] Protected routes (CP-7)
 - [x] Firebase Firestore (CP-7)
+- [x] publicApi & conditional navbar (CP-7)
 
-Phase 4: Deployment - ⏳ NEXT
-- [ ] Polish & Responsive (CP-8)
-- [ ] Deploy to Vercel (CP-8)
-- [ ] Setup Environment Variables (CP-8)
-- [ ] Production testing (CP-8)
+Phase 4: Polish - ⏳ NEXT (CP-8)
+- [ ] Responsive design (mobile/tablet)
+- [ ] Loading states
+- [ ] Error handling
+- [ ] UI/UX final touch
+
+Phase 5: Deployment - ⏳ BELUM (CP-9)
+- [ ] Deploy to Vercel
+- [ ] Environment Variables
+- [ ] Production testing
 
 
-Status: Development (All CP Done, CP-8 Next)
-Last Updated: 2026-08-14
+Status: Development (CP-7 Done, CP-8 Next)
+Last Updated: 2026-08-18

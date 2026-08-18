@@ -96,23 +96,15 @@ const AdminSettings = () => {
     <div className="min-h-screen bg-gray-50">
       {/* Navbar */}
       <nav className="bg-white border-b border-gray-200 px-4 py-3 sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => navigate('/admin')}
-              className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </button>
-            <span className="text-xl font-bold text-brick-700">Settings</span>
-            <span className="text-sm text-gray-500 hidden sm:inline">| Manage Account</span>
-          </div>
+        <div className="max-w-7xl mx-auto flex items-center">
           <button
             onClick={() => navigate('/admin')}
-            className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 font-medium"
+            className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition"
           >
-            Back to Admin
+            <ArrowLeft className="w-5 h-5" />
           </button>
+          <span className="text-xl font-bold text-brick-700 ml-3">Settings</span>
+          <span className="text-sm text-gray-500 hidden sm:inline ml-2">| Manage Account</span>
         </div>
       </nav>
 

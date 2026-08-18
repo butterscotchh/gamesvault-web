@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Gamepad2, Mail, Lock } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import api from '../../api/axios';
+import { publicApi } from '../../api/axios';
 import toast from 'react-hot-toast';
 
 const LoginPage = () => {
@@ -22,14 +22,13 @@ const LoginPage = () => {
 
     setIsLoading(true);
     try {
-      const response = await api.post('/login', {
+      const response = await publicApi.post('/login', {
         username: username.trim(),
         password: password.trim()
       });
 
       if (response.data.success) {
-        // Simpan token (nanti pake JWT)
-        const token = response.data.token || 'dummy_token_' + Date.now();
+        const token = response.data.token;
         login(token);
         toast.success('Login berhasil!');
         navigate('/admin');

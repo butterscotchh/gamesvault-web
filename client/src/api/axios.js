@@ -2,6 +2,8 @@ import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
+// ============ INSTANCE UNTUK PROTECTED ROUTES ============
+// Pake token JWT (untuk admin)
 const api = axios.create({
   baseURL: API_URL,
   headers: {
@@ -9,22 +11,25 @@ const api = axios.create({
   },
 });
 
-// Interceptor: Tambah JWT ke setiap request
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('adminToken');
-    console.log('Token from localStorage:', token); // DEBUG
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-      console.log('✅ Token added to headers');
-    } else {
-      console.log('❌ No token found!');
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
+// ============ INSTANCE UNTUK PUBLIC ROUTES ============
+// GA pake token (untuk login, promo, get products)
+const publicApi = axios.create({
+  baseURL: API_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+export { api, publicApi };
 export default api;
