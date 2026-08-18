@@ -126,10 +126,38 @@ const AdminPage = () => {
 
   const isEditing = editingId !== null;
 
+  // ============ LOADING SKELETON ============
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-gray-500">Loading products...</div>
+      <div className="min-h-screen bg-gray-50">
+        {/* Navbar skeleton */}
+        <div className="bg-white border-b border-gray-200 px-4 py-3">
+          <div className="max-w-7xl mx-auto flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="h-7 w-32 bg-gray-200 rounded animate-pulse" />
+              <div className="h-4 w-24 bg-gray-200 rounded animate-pulse hidden sm:block" />
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="h-8 w-16 bg-gray-200 rounded animate-pulse" />
+              <div className="h-8 w-16 bg-gray-200 rounded animate-pulse" />
+              <div className="h-8 w-16 bg-gray-200 rounded animate-pulse" />
+            </div>
+          </div>
+        </div>
+
+        {/* Table skeleton */}
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          <div className="flex justify-between items-center mb-6">
+            <div>
+              <div className="h-8 w-32 bg-gray-200 rounded animate-pulse" />
+              <div className="h-4 w-48 bg-gray-200 rounded animate-pulse mt-1" />
+            </div>
+            <div className="h-10 w-32 bg-gray-200 rounded animate-pulse" />
+          </div>
+          <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200">
+            <div className="p-8 text-center text-gray-400">Loading products...</div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -188,7 +216,7 @@ const AdminPage = () => {
 
         {/* Form Tambah/Edit Product */}
         {showForm && (
-          <div className="bg-white rounded-xl shadow-md p-6 mb-6 border border-gray-200">
+          <div className="bg-white rounded-xl shadow-md p-6 mb-6 border border-gray-200 animate-fadeIn">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-gray-800">
                 {isEditing ? 'Edit Product' : 'Tambah Product Baru'}
@@ -212,7 +240,7 @@ const AdminPage = () => {
                     value={formData.name}
                     onChange={handleInputChange}
                     placeholder="Contoh: PSP 3000"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brick-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brick-500 transition"
                     required
                   />
                 </div>
@@ -226,7 +254,7 @@ const AdminPage = () => {
                     value={formData.image}
                     onChange={handleInputChange}
                     placeholder="https://example.com/image.jpg"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brick-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brick-500 transition"
                   />
                 </div>
                 <div>
@@ -239,7 +267,7 @@ const AdminPage = () => {
                     value={formData.shopeeLink}
                     onChange={handleInputChange}
                     placeholder="https://shopee.co.id/..."
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brick-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brick-500 transition"
                   />
                 </div>
                 <div>
@@ -252,7 +280,7 @@ const AdminPage = () => {
                     value={formData.tokopediaLink}
                     onChange={handleInputChange}
                     placeholder="https://tokopedia.com/..."
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brick-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brick-500 transition"
                   />
                 </div>
               </div>
@@ -316,7 +344,7 @@ const AdminPage = () => {
                           alt={product.name}
                           className="w-12 h-12 object-cover rounded-lg"
                           onError={(e) => {
-                            e.target.src = 'https://via.placeholder.com/300x200/9e6b54/ffffff?text=No+Image';
+                            e.target.src = 'https://placehold.co/300x200/9e6b54/ffffff?text=No+Image';
                           }}
                         />
                       </td>

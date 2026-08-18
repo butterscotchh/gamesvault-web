@@ -9,6 +9,7 @@ const AdminSettings = () => {
   const navigate = useNavigate();
   const { logout } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [adminData, setAdminData] = useState(null);
   
   const [formData, setFormData] = useState({
@@ -34,6 +35,7 @@ const AdminSettings = () => {
         console.error('Error parsing token:', error);
       }
     }
+    setLoading(false);
   }, []);
 
   const handleChange = (e) => {
@@ -92,6 +94,41 @@ const AdminSettings = () => {
     }
   };
 
+  // ============ LOADING SKELETON ============
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        {/* Navbar skeleton */}
+        <div className="bg-white border-b border-gray-200 px-4 py-3">
+          <div className="max-w-7xl mx-auto flex items-center">
+            <div className="w-10 h-10 bg-gray-200 rounded-lg animate-pulse" />
+            <div className="h-7 w-24 bg-gray-200 rounded animate-pulse ml-3" />
+            <div className="h-4 w-32 bg-gray-200 rounded animate-pulse ml-2 hidden sm:block" />
+          </div>
+        </div>
+
+        {/* Form skeleton */}
+        <div className="max-w-2xl mx-auto px-4 py-12">
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8">
+            <div className="text-center mb-8">
+              <div className="h-8 w-48 bg-gray-200 rounded animate-pulse mx-auto" />
+              <div className="h-4 w-64 bg-gray-200 rounded animate-pulse mt-2 mx-auto" />
+            </div>
+            <div className="space-y-6">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <div key={i}>
+                  <div className="h-4 w-32 bg-gray-200 rounded animate-pulse mb-1" />
+                  <div className="h-12 bg-gray-200 rounded-lg animate-pulse" />
+                </div>
+              ))}
+              <div className="h-12 bg-gray-200 rounded-lg animate-pulse" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Navbar */}
@@ -110,7 +147,7 @@ const AdminSettings = () => {
 
       {/* Main Content */}
       <div className="max-w-2xl mx-auto px-4 py-12">
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8">
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8 animate-fadeIn">
           <div className="text-center mb-8">
             <h1 className="text-2xl font-bold text-gray-800">Account Settings</h1>
             <p className="text-gray-500 text-sm mt-1">Ubah username atau password admin</p>
