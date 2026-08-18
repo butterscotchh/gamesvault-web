@@ -3,3 +3,6 @@
 .env.*.local
 serviceAccountKey.json
 *.key.json
+seed-admin.js
+add-admin.js
+*.seed.js
