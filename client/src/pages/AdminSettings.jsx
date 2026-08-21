@@ -83,7 +83,7 @@ const AdminSettings = () => {
         setTimeout(() => {
           logout();
           navigate('/login');
-          toast.info('Silakan login ulang!');
+          toast('Silakan login ulang!');
         }, 2000);
       }
     } catch (error) {
