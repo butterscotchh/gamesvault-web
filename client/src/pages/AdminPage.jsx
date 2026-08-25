@@ -77,7 +77,6 @@ const AdminPage = () => {
 
     try {
       if (editingId) {
-        // EDIT
         const response = await api.put(`/products/${editingId}`, {
           name: formData.name.trim(),
           image: formData.image.trim(),
@@ -87,7 +86,6 @@ const AdminPage = () => {
         setProducts(products.map(p => p.id === editingId ? response.data : p));
         toast.success('Produk berhasil diupdate!');
       } else {
-        // ADD
         const response = await api.post('/products', {
           name: formData.name.trim(),
           image: formData.image.trim(),
@@ -118,6 +116,23 @@ const AdminPage = () => {
     }
   };
 
+  const handleToggleSold = async (id) => {
+    const product = products.find(p => p.id === id);
+    if (!product) return;
+
+    try {
+      const response = await api.put(`/products/${id}`, {
+        ...product,
+        isSold: !product.isSold
+      });
+      setProducts(products.map(p => p.id === id ? response.data : p));
+      toast.success(`Produk ${response.data.isSold ? 'ditandai SOLD' : 'dibuka kembali'}`);
+    } catch (error) {
+      console.error('Error toggling sold status:', error);
+      toast.error('Gagal mengubah status!');
+    }
+  };
+
   const handleLogout = () => {
     logout();
     navigate('/');
@@ -126,68 +141,42 @@ const AdminPage = () => {
 
   const isEditing = editingId !== null;
 
-  // ============ LOADING SKELETON ============
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        {/* Navbar skeleton */}
-        <div className="bg-white border-b border-gray-200 px-4 py-3">
-          <div className="max-w-7xl mx-auto flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="h-7 w-32 bg-gray-200 rounded animate-pulse" />
-              <div className="h-4 w-24 bg-gray-200 rounded animate-pulse hidden sm:block" />
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="h-8 w-16 bg-gray-200 rounded animate-pulse" />
-              <div className="h-8 w-16 bg-gray-200 rounded animate-pulse" />
-              <div className="h-8 w-16 bg-gray-200 rounded animate-pulse" />
-            </div>
-          </div>
-        </div>
-
-        {/* Table skeleton */}
-        <div className="max-w-7xl mx-auto px-4 py-8">
-          <div className="flex justify-between items-center mb-6">
-            <div>
-              <div className="h-8 w-32 bg-gray-200 rounded animate-pulse" />
-              <div className="h-4 w-48 bg-gray-200 rounded animate-pulse mt-1" />
-            </div>
-            <div className="h-10 w-32 bg-gray-200 rounded animate-pulse" />
-          </div>
-          <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200">
-            <div className="p-8 text-center text-gray-400">Loading products...</div>
-          </div>
-        </div>
+      <div className="min-h-screen flex items-center justify-center" style={{ background: '#f5f0eb' }}>
+        <div style={{ color: '#6a5a4a' }}>Loading products...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen" style={{ background: '#f5f0eb' }}>
       {/* Navbar Admin */}
-      <nav className="bg-white border-b border-gray-200 px-4 py-3 sticky top-0 z-10">
+      <nav className="border-b px-4 py-2" style={{ background: '#ffffff', borderColor: '#d5c8b8' }}>
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-xl font-bold text-brick-700">Admin Panel</span>
-            <span className="text-sm text-gray-500 hidden sm:inline">| Manage Products</span>
+            <span className="text-sm font-bold" style={{ color: '#2c2c2c' }}>Admin Panel</span>
+            <span className="text-xs" style={{ color: '#8a7a6a' }}>| Manage Products</span>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <button
               onClick={() => navigate('/')}
-              className="px-4 py-2 text-sm text-gray-600 hover:text-brick-600 font-medium transition flex items-center gap-1"
+              className="px-3 py-1 text-xs transition-colors"
+              style={{ color: '#4a3a2a' }}
             >
-              <Home className="w-4 h-4" />
               Home
             </button>
             <button
               onClick={() => navigate('/admin/settings')}
-              className="px-4 py-2 text-sm text-gray-600 hover:text-brick-600 font-medium transition"
+              className="px-3 py-1 text-xs transition-colors"
+              style={{ color: '#4a3a2a' }}
             >
               Settings
             </button>
             <button
               onClick={handleLogout}
-              className="px-4 py-2 text-sm text-red-600 hover:text-red-700 font-medium"
+              className="px-3 py-1 text-xs transition-colors"
+              style={{ color: '#cc0000' }}
             >
               Logout
             </button>
@@ -196,19 +185,20 @@ const AdminPage = () => {
       </nav>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 py-6">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-800">Products</h1>
-            <p className="text-gray-500 text-sm">Kelola katalog produk kamu</p>
+            <h1 className="text-lg font-bold" style={{ color: '#2c2c2c' }}>Products</h1>
+            <p className="text-xs" style={{ color: '#6a5a4a' }}>Kelola katalog produk kamu</p>
           </div>
           {!showForm && (
             <button
               onClick={handleAdd}
-              className="flex items-center gap-2 px-4 py-2 bg-brick-600 text-white rounded-lg hover:bg-brick-700 transition shadow-sm"
+              className="flex items-center gap-1 px-3 py-1.5 text-xs transition-colors"
+              style={{ background: '#2c2c2c', color: '#f5f0eb' }}
             >
-              <Plus className="w-5 h-5" />
+              <Plus className="w-3.5 h-3.5" />
               Add Product
             </button>
           )}
@@ -216,23 +206,24 @@ const AdminPage = () => {
 
         {/* Form Tambah/Edit Product */}
         {showForm && (
-          <div className="bg-white rounded-xl shadow-md p-6 mb-6 border border-gray-200 animate-fadeIn">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-gray-800">
+          <div className="p-4 mb-4 border" style={{ background: '#ffffff', borderColor: '#d5c8b8' }}>
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-sm font-semibold" style={{ color: '#2c2c2c' }}>
                 {isEditing ? 'Edit Product' : 'Tambah Product Baru'}
               </h2>
               <button
                 onClick={resetForm}
-                className="p-1 text-gray-400 hover:text-gray-600 transition"
+                className="p-1 transition-colors"
+                style={{ color: '#8a7a6a' }}
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <form onSubmit={handleSubmit} className="space-y-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Nama Produk <span className="text-red-500">*</span>
+                  <label className="block text-xs font-medium mb-1" style={{ color: '#4a3a2a' }}>
+                    Nama Produk <span style={{ color: '#cc0000' }}>*</span>
                   </label>
                   <input
                     type="text"
@@ -240,12 +231,13 @@ const AdminPage = () => {
                     value={formData.name}
                     onChange={handleInputChange}
                     placeholder="Contoh: PSP 3000"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brick-500 transition"
+                    className="w-full px-3 py-1.5 border text-sm focus:outline-none focus:ring-1"
+                    style={{ borderColor: '#d5c8b8', background: '#faf8f6', color: '#2c2c2c' }}
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-xs font-medium mb-1" style={{ color: '#4a3a2a' }}>
                     URL Gambar
                   </label>
                   <input
@@ -254,11 +246,12 @@ const AdminPage = () => {
                     value={formData.image}
                     onChange={handleInputChange}
                     placeholder="https://example.com/image.jpg"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brick-500 transition"
+                    className="w-full px-3 py-1.5 border text-sm focus:outline-none focus:ring-1"
+                    style={{ borderColor: '#d5c8b8', background: '#faf8f6', color: '#2c2c2c' }}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-xs font-medium mb-1" style={{ color: '#4a3a2a' }}>
                     Link Shopee
                   </label>
                   <input
@@ -267,11 +260,12 @@ const AdminPage = () => {
                     value={formData.shopeeLink}
                     onChange={handleInputChange}
                     placeholder="https://shopee.co.id/..."
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brick-500 transition"
+                    className="w-full px-3 py-1.5 border text-sm focus:outline-none focus:ring-1"
+                    style={{ borderColor: '#d5c8b8', background: '#faf8f6', color: '#2c2c2c' }}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-xs font-medium mb-1" style={{ color: '#4a3a2a' }}>
                     Link Tokopedia
                   </label>
                   <input
@@ -280,33 +274,26 @@ const AdminPage = () => {
                     value={formData.tokopediaLink}
                     onChange={handleInputChange}
                     placeholder="https://tokopedia.com/..."
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brick-500 transition"
+                    className="w-full px-3 py-1.5 border text-sm focus:outline-none focus:ring-1"
+                    style={{ borderColor: '#d5c8b8', background: '#faf8f6', color: '#2c2c2c' }}
                   />
                 </div>
               </div>
-              <div className="flex justify-end gap-3">
+              <div className="flex justify-end gap-2">
                 <button
                   type="button"
                   onClick={resetForm}
-                  className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
+                  className="px-3 py-1.5 border text-xs transition-colors"
+                  style={{ borderColor: '#d5c8b8', color: '#4a3a2a' }}
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
-                  className="flex items-center gap-2 px-4 py-2 bg-brick-600 text-white rounded-lg hover:bg-brick-700 transition"
+                  className="px-3 py-1.5 text-xs transition-colors"
+                  style={{ background: '#2c2c2c', color: '#f5f0eb' }}
                 >
-                  {isEditing ? (
-                    <>
-                      <Save className="w-4 h-4" />
-                      Update Produk
-                    </>
-                  ) : (
-                    <>
-                      <Plus className="w-4 h-4" />
-                      Simpan Produk
-                    </>
-                  )}
+                  {isEditing ? 'Update Produk' : 'Simpan Produk'}
                 </button>
               </div>
             </form>
@@ -314,82 +301,100 @@ const AdminPage = () => {
         )}
 
         {/* List Products */}
-        <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200">
+        <div className="border" style={{ background: '#ffffff', borderColor: '#d5c8b8' }}>
           <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
+            <table className="w-full text-sm">
+              <thead className="border-b" style={{ background: '#f5f0eb', borderColor: '#d5c8b8' }}>
                 <tr>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">#</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Image</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Name</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Shopee</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-600">Tokopedia</th>
-                  <th className="px-4 py-3 text-right text-sm font-medium text-gray-600">Actions</th>
+                  <th className="px-3 py-2 text-left text-xs font-medium" style={{ color: '#4a3a2a' }}>#</th>
+                  <th className="px-3 py-2 text-left text-xs font-medium" style={{ color: '#4a3a2a' }}>Image</th>
+                  <th className="px-3 py-2 text-left text-xs font-medium" style={{ color: '#4a3a2a' }}>Name</th>
+                  <th className="px-3 py-2 text-left text-xs font-medium" style={{ color: '#4a3a2a' }}>Shopee</th>
+                  <th className="px-3 py-2 text-left text-xs font-medium" style={{ color: '#4a3a2a' }}>Tokopedia</th>
+                  <th className="px-3 py-2 text-left text-xs font-medium" style={{ color: '#4a3a2a' }}>Status</th>
+                  <th className="px-3 py-2 text-right text-xs font-medium" style={{ color: '#4a3a2a' }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {products.length === 0 ? (
                   <tr>
-                    <td colSpan="6" className="px-4 py-8 text-center text-gray-500">
+                    <td colSpan="7" className="px-3 py-6 text-center text-xs" style={{ color: '#8a7a6a' }}>
                       Belum ada produk. Tambahkan produk baru!
                     </td>
                   </tr>
                 ) : (
                   products.map((product, index) => (
-                    <tr key={product.id} className="border-b border-gray-100 hover:bg-gray-50 transition">
-                      <td className="px-4 py-3 text-sm text-gray-600">{index + 1}</td>
-                      <td className="px-4 py-3">
+                    <tr key={product.id} className="border-b transition-colors hover:bg-gray-50" style={{ borderColor: '#ece3d8' }}>
+                      <td className="px-3 py-2 text-xs" style={{ color: '#6a5a4a' }}>{index + 1}</td>
+                      <td className="px-3 py-2">
                         <img
                           src={product.image}
                           alt={product.name}
-                          className="w-12 h-12 object-cover rounded-lg"
+                          className="w-10 h-10 object-cover"
                           onError={(e) => {
                             e.target.src = 'https://placehold.co/300x200/9e6b54/ffffff?text=No+Image';
                           }}
                         />
                       </td>
-                      <td className="px-4 py-3 text-sm font-medium text-gray-800">{product.name}</td>
-                      <td className="px-4 py-3">
+                      <td className="px-3 py-2 text-xs font-medium" style={{ color: '#2c2c2c' }}>{product.name}</td>
+                      <td className="px-3 py-2">
                         {product.shopeeLink ? (
                           <a
                             href={product.shopeeLink}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-orange-500 hover:text-orange-600 text-sm"
+                            className="text-xs"
+                            style={{ color: '#cc0000' }}
                           >
                             Link
                           </a>
                         ) : (
-                          <span className="text-gray-400 text-sm">-</span>
+                          <span className="text-xs" style={{ color: '#8a7a6a' }}>-</span>
                         )}
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-3 py-2">
                         {product.tokopediaLink ? (
                           <a
                             href={product.tokopediaLink}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-green-500 hover:text-green-600 text-sm"
+                            className="text-xs"
+                            style={{ color: '#cc0000' }}
                           >
                             Link
                           </a>
                         ) : (
-                          <span className="text-gray-400 text-sm">-</span>
+                          <span className="text-xs" style={{ color: '#8a7a6a' }}>-</span>
                         )}
                       </td>
-                      <td className="px-4 py-3 text-right">
-                        <div className="flex items-center justify-end gap-2">
+                      <td className="px-3 py-2">
+                        <button
+                          onClick={() => handleToggleSold(product.id)}
+                          className="px-2 py-0.5 text-xs border transition-colors"
+                          style={{
+                            borderColor: product.isSold ? '#2c2c2c' : '#d5c8b8',
+                            background: product.isSold ? '#2c2c2c' : 'transparent',
+                            color: product.isSold ? '#f5f0eb' : '#4a3a2a',
+                          }}
+                        >
+                          {product.isSold ? 'SOLD' : 'Active'}
+                        </button>
+                      </td>
+                      <td className="px-3 py-2 text-right">
+                        <div className="flex items-center justify-end gap-1">
                           <button
                             onClick={() => handleEdit(product)}
-                            className="p-2 text-blue-500 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition"
+                            className="p-1 transition-colors"
+                            style={{ color: '#4a3a2a' }}
                           >
-                            <Edit className="w-5 h-5" />
+                            <Edit className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => handleDelete(product.id)}
-                            className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition"
+                            className="p-1 transition-colors"
+                            style={{ color: '#cc0000' }}
                           >
-                            <Trash2 className="w-5 h-5" />
+                            <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
                       </td>
@@ -402,7 +407,7 @@ const AdminPage = () => {
         </div>
 
         {/* Total Products */}
-        <div className="mt-4 text-sm text-gray-500">
+        <div className="mt-2 text-xs" style={{ color: '#8a7a6a' }}>
           Total: {products.length} produk
         </div>
       </div>
