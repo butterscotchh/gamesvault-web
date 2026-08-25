@@ -10,7 +10,6 @@ const AdminSettings = () => {
   const { logout } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [adminData, setAdminData] = useState(null);
   
   const [formData, setFormData] = useState({
     currentUsername: '',
@@ -20,13 +19,12 @@ const AdminSettings = () => {
     confirmPassword: ''
   });
 
-  // Ambil data admin dari localStorage atau context
+  // Ambil data admin dari localStorage
   useEffect(() => {
     const token = localStorage.getItem('adminToken');
     if (token) {
       try {
         const payload = JSON.parse(atob(token.split('.')[1]));
-        setAdminData(payload);
         setFormData(prev => ({
           ...prev,
           currentUsername: payload.username || ''
@@ -45,7 +43,6 @@ const AdminSettings = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validasi
     if (!formData.currentPassword) {
       toast.error('Masukkan password lama!');
       return;
@@ -56,7 +53,6 @@ const AdminSettings = () => {
       return;
     }
 
-    // Minimal salah satu diubah
     if (!formData.newUsername && !formData.newPassword) {
       toast.error('Isi minimal satu field (username atau password)!');
       return;
@@ -74,12 +70,10 @@ const AdminSettings = () => {
       if (response.data.success) {
         toast.success('Settings updated!');
         
-        // Kalo username berubah, update token
         if (response.data.token) {
           localStorage.setItem('adminToken', response.data.token);
         }
         
-        // Logout setelah 2 detik (biar refresh token)
         setTimeout(() => {
           logout();
           navigate('/login');
@@ -94,84 +88,58 @@ const AdminSettings = () => {
     }
   };
 
-  // ============ LOADING SKELETON ============
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        {/* Navbar skeleton */}
-        <div className="bg-white border-b border-gray-200 px-4 py-3">
-          <div className="max-w-7xl mx-auto flex items-center">
-            <div className="w-10 h-10 bg-gray-200 rounded-lg animate-pulse" />
-            <div className="h-7 w-24 bg-gray-200 rounded animate-pulse ml-3" />
-            <div className="h-4 w-32 bg-gray-200 rounded animate-pulse ml-2 hidden sm:block" />
-          </div>
-        </div>
-
-        {/* Form skeleton */}
-        <div className="max-w-2xl mx-auto px-4 py-12">
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8">
-            <div className="text-center mb-8">
-              <div className="h-8 w-48 bg-gray-200 rounded animate-pulse mx-auto" />
-              <div className="h-4 w-64 bg-gray-200 rounded animate-pulse mt-2 mx-auto" />
-            </div>
-            <div className="space-y-6">
-              {[1, 2, 3, 4, 5].map((i) => (
-                <div key={i}>
-                  <div className="h-4 w-32 bg-gray-200 rounded animate-pulse mb-1" />
-                  <div className="h-12 bg-gray-200 rounded-lg animate-pulse" />
-                </div>
-              ))}
-              <div className="h-12 bg-gray-200 rounded-lg animate-pulse" />
-            </div>
-          </div>
-        </div>
+      <div className="min-h-screen flex items-center justify-center" style={{ background: '#f5f0eb' }}>
+        <div style={{ color: '#6a5a4a' }}>Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen" style={{ background: '#f5f0eb' }}>
       {/* Navbar */}
-      <nav className="bg-white border-b border-gray-200 px-4 py-3 sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto flex items-center">
+      <nav className="border-b px-4 py-2" style={{ background: '#ffffff', borderColor: '#d5c8b8' }}>
+        <div className="max-w-2xl mx-auto flex items-center">
           <button
             onClick={() => navigate('/admin')}
-            className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition"
+            className="p-1 transition-colors"
+            style={{ color: '#4a3a2a' }}
           >
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeft className="w-4 h-4" />
           </button>
-          <span className="text-xl font-bold text-brick-700 ml-3">Settings</span>
-          <span className="text-sm text-gray-500 hidden sm:inline ml-2">| Manage Account</span>
+          <span className="text-sm font-bold ml-2" style={{ color: '#2c2c2c' }}>Settings</span>
+          <span className="text-xs ml-2" style={{ color: '#8a7a6a' }}>| Manage Account</span>
         </div>
       </nav>
 
       {/* Main Content */}
-      <div className="max-w-2xl mx-auto px-4 py-12">
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8 animate-fadeIn">
-          <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold text-gray-800">Account Settings</h1>
-            <p className="text-gray-500 text-sm mt-1">Ubah username atau password admin</p>
+      <div className="max-w-md mx-auto px-4 py-8">
+        <div className="p-6 border" style={{ background: '#ffffff', borderColor: '#d5c8b8' }}>
+          <div className="text-center mb-6">
+            <h1 className="text-base font-bold" style={{ color: '#2c2c2c' }}>Account Settings</h1>
+            <p className="text-xs" style={{ color: '#6a5a4a' }}>Ubah username atau password admin</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-4">
             {/* Username Saat Ini */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-xs font-medium mb-1" style={{ color: '#4a3a2a' }}>
                 Username Saat Ini
               </label>
               <input
                 type="text"
                 value={formData.currentUsername}
                 disabled
-                className="w-full px-4 py-2.5 bg-gray-100 border border-gray-200 rounded-lg text-gray-500 cursor-not-allowed"
+                className="w-full px-3 py-1.5 border text-sm"
+                style={{ borderColor: '#d5c8b8', background: '#f5f0eb', color: '#8a7a6a' }}
               />
-              <p className="text-xs text-gray-400 mt-1">Username tidak bisa diubah tanpa password lama</p>
             </div>
 
             {/* Username Baru */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Username Baru <span className="text-gray-400 text-xs">(opsional)</span>
+              <label className="block text-xs font-medium mb-1" style={{ color: '#4a3a2a' }}>
+                Username Baru <span style={{ color: '#8a7a6a', fontSize: '10px' }}>(opsional)</span>
               </label>
               <input
                 type="text"
@@ -179,18 +147,18 @@ const AdminSettings = () => {
                 value={formData.newUsername}
                 onChange={handleChange}
                 placeholder="Masukkan username baru"
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brick-500 transition"
+                className="w-full px-3 py-1.5 border text-sm focus:outline-none focus:ring-1"
+                style={{ borderColor: '#d5c8b8', background: '#faf8f6', color: '#2c2c2c' }}
                 disabled={isLoading}
               />
             </div>
 
-            {/* Divider */}
-            <div className="border-t border-gray-200 my-6" />
+            <div className="border-t" style={{ borderColor: '#ece3d8' }} />
 
             {/* Password Lama */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Password Lama <span className="text-red-500">*</span>
+              <label className="block text-xs font-medium mb-1" style={{ color: '#4a3a2a' }}>
+                Password Lama <span style={{ color: '#cc0000' }}>*</span>
               </label>
               <input
                 type="password"
@@ -198,7 +166,8 @@ const AdminSettings = () => {
                 value={formData.currentPassword}
                 onChange={handleChange}
                 placeholder="Masukkan password lama"
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brick-500 transition"
+                className="w-full px-3 py-1.5 border text-sm focus:outline-none focus:ring-1"
+                style={{ borderColor: '#d5c8b8', background: '#faf8f6', color: '#2c2c2c' }}
                 required
                 disabled={isLoading}
               />
@@ -206,8 +175,8 @@ const AdminSettings = () => {
 
             {/* Password Baru */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Password Baru <span className="text-gray-400 text-xs">(opsional)</span>
+              <label className="block text-xs font-medium mb-1" style={{ color: '#4a3a2a' }}>
+                Password Baru <span style={{ color: '#8a7a6a', fontSize: '10px' }}>(opsional)</span>
               </label>
               <input
                 type="password"
@@ -215,14 +184,15 @@ const AdminSettings = () => {
                 value={formData.newPassword}
                 onChange={handleChange}
                 placeholder="Masukkan password baru"
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brick-500 transition"
+                className="w-full px-3 py-1.5 border text-sm focus:outline-none focus:ring-1"
+                style={{ borderColor: '#d5c8b8', background: '#faf8f6', color: '#2c2c2c' }}
                 disabled={isLoading}
               />
             </div>
 
             {/* Konfirmasi Password Baru */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-xs font-medium mb-1" style={{ color: '#4a3a2a' }}>
                 Konfirmasi Password Baru
               </label>
               <input
@@ -231,31 +201,22 @@ const AdminSettings = () => {
                 value={formData.confirmPassword}
                 onChange={handleChange}
                 placeholder="Konfirmasi password baru"
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brick-500 transition"
+                className="w-full px-3 py-1.5 border text-sm focus:outline-none focus:ring-1"
+                style={{ borderColor: '#d5c8b8', background: '#faf8f6', color: '#2c2c2c' }}
                 disabled={isLoading}
               />
             </div>
 
-            {/* Submit */}
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3 bg-brick-600 hover:bg-brick-700 text-white font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="w-full py-2 text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{ background: '#2c2c2c', color: '#f5f0eb' }}
             >
-              {isLoading ? (
-                <>
-                  <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Updating...
-                </>
-              ) : (
-                <>
-                  <Save className="w-5 h-5" />
-                  Save Changes
-                </>
-              )}
+              {isLoading ? 'Updating...' : 'Save Changes'}
             </button>
 
-            <p className="text-xs text-gray-400 text-center">
+            <p className="text-[10px] text-center" style={{ color: '#8a7a6a' }}>
               * Anda akan logout otomatis setelah perubahan disimpan
             </p>
           </form>

@@ -36,7 +36,6 @@ app.post('/api/login', async (req, res) => {
   try {
     const { username, password } = req.body;
 
-    // Cari admin di Firestore
     const snapshot = await db.collection('admins')
       .where('username', '==', username)
       .get();
@@ -52,7 +51,6 @@ app.post('/api/login', async (req, res) => {
     const adminDoc = snapshot.docs[0];
     const adminData = adminDoc.data();
 
-    // Verifikasi password dengan bcrypt
     const isValid = await bcrypt.compare(password, adminData.passwordHash);
     if (!isValid) {
       console.log(`❌ Login failed: ${username} (wrong password)`);
@@ -62,7 +60,6 @@ app.post('/api/login', async (req, res) => {
       });
     }
 
-    // Generate JWT Token
     const token = jwt.sign(
       { 
         id: adminDoc.id, 
@@ -171,6 +168,7 @@ app.post('/api/products', verifyToken, async (req, res) => {
       image: image || 'https://via.placeholder.com/300x200/9e6b54/ffffff?text=No+Image',
       shopeeLink: shopeeLink || '',
       tokopediaLink: tokopediaLink || '',
+      isSold: false,
       createdAt: new Date().toISOString()
     };
 
@@ -191,7 +189,7 @@ app.post('/api/products', verifyToken, async (req, res) => {
 // PUT: Update produk (PROTECTED)
 app.put('/api/products/:id', verifyToken, async (req, res) => {
   try {
-    const { name, image, shopeeLink, tokopediaLink } = req.body;
+    const { name, image, shopeeLink, tokopediaLink, isSold } = req.body;
     const docRef = db.collection('products').doc(req.params.id);
 
     const doc = await docRef.get();
@@ -211,6 +209,7 @@ app.put('/api/products/:id', verifyToken, async (req, res) => {
       image: image || doc.data().image,
       shopeeLink: shopeeLink || '',
       tokopediaLink: tokopediaLink || '',
+      isSold: isSold !== undefined ? isSold : (doc.data().isSold || false),
       updatedAt: new Date().toISOString()
     };
 
@@ -257,7 +256,6 @@ app.put('/api/admin/settings', verifyToken, async (req, res) => {
     const { currentUsername, newUsername, currentPassword, newPassword } = req.body;
     const userId = req.user.id;
 
-    // Ambil data admin dari Firestore
     const docRef = db.collection('admins').doc(userId);
     const doc = await docRef.get();
 
@@ -267,7 +265,6 @@ app.put('/api/admin/settings', verifyToken, async (req, res) => {
 
     const adminData = doc.data();
 
-    // Verifikasi password lama
     const isValid = await bcrypt.compare(currentPassword, adminData.passwordHash);
     if (!isValid) {
       return res.status(401).json({ error: 'Password lama salah!' });
@@ -275,9 +272,7 @@ app.put('/api/admin/settings', verifyToken, async (req, res) => {
 
     const updateData = {};
 
-    // Update username
     if (newUsername) {
-      // Cek apakah username baru sudah dipakai
       const existing = await db.collection('admins')
         .where('username', '==', newUsername)
         .get();
@@ -289,23 +284,19 @@ app.put('/api/admin/settings', verifyToken, async (req, res) => {
       updateData.username = newUsername;
     }
 
-    // Update password
     if (newPassword) {
       updateData.passwordHash = await bcrypt.hash(newPassword, 10);
     }
 
-    // Kalo ga ada yang diubah
     if (Object.keys(updateData).length === 0) {
       return res.status(400).json({ error: 'Tidak ada perubahan!' });
     }
 
-    // Update ke Firestore
     await docRef.update({
       ...updateData,
       updatedAt: new Date().toISOString()
     });
 
-    // Generate token baru kalo username berubah
     let newToken = null;
     if (newUsername) {
       newToken = jwt.sign(

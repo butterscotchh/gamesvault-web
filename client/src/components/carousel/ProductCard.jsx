@@ -13,6 +13,7 @@ const ProductCard = ({ product }) => {
   const hasShopee    = product.shopeeLink    && product.shopeeLink    !== '#';
   const hasTokopedia = product.tokopediaLink && product.tokopediaLink !== '#';
   const gradient = titleBarGradients[cardIndex++ % titleBarGradients.length];
+  const isSold = product.isSold || false;
 
   return (
     <div
@@ -29,14 +30,30 @@ const ProductCard = ({ product }) => {
         <Star className="w-2.5 h-2.5 opacity-70" fill="currentColor" style={{ color: '#4a3570' }} />
       </div>
 
-      {/* Image */}
+      {/* Image - dengan SOLD overlay */}
       <div className="relative overflow-hidden scanlines" style={{ background: '#ede5ff' }}>
         <img
           src={product.image}
           alt={product.name}
           className="w-full h-44 object-cover group-hover:scale-105 transition-all duration-500"
-          style={{ opacity: 0.95 }}
+          style={{ opacity: isSold ? 0.4 : 0.95 }}
         />
+        
+        {/* ── SOLD OVERLAY ── */}
+        {isSold && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black/10">
+            <span className="px-4 py-2 text-sm font-bold tracking-widest border-2 rotate-[-15deg]" style={{
+              fontFamily: '"Press Start 2P", monospace',
+              color: '#4a3570',
+              borderColor: '#4a3570',
+              background: 'rgba(255,255,255,0.85)',
+              boxShadow: '0 0 20px rgba(0,0,0,0.1)',
+            }}>
+              SOLD
+            </span>
+          </div>
+        )}
+
         {/* Soft pastel tint on hover */}
         <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
           style={{ background: 'linear-gradient(135deg, #f5a8d015, #c9a8f510, #a8d8f515)' }} />
@@ -57,7 +74,7 @@ const ProductCard = ({ product }) => {
         <div className="h-px mb-3" style={{ background: 'linear-gradient(90deg, #f5a8d0, #c9a8f5, #a8d8f5)' }} />
 
         <div className="flex flex-wrap gap-1.5">
-          {hasShopee && (
+          {!isSold && hasShopee && (
             <a href={product.shopeeLink} target="_blank" rel="noopener noreferrer"
               className="flex items-center gap-1 px-2 py-1 text-[8px] tracking-wide transition-all hover:-translate-y-0.5"
               style={{
@@ -71,7 +88,7 @@ const ProductCard = ({ product }) => {
               SHOPEE
             </a>
           )}
-          {hasTokopedia && (
+          {!isSold && hasTokopedia && (
             <a href={product.tokopediaLink} target="_blank" rel="noopener noreferrer"
               className="flex items-center gap-1 px-2 py-1 text-[8px] tracking-wide transition-all hover:-translate-y-0.5"
               style={{
@@ -85,8 +102,11 @@ const ProductCard = ({ product }) => {
               TOPED
             </a>
           )}
-          {!hasShopee && !hasTokopedia && (
+          {!isSold && !hasShopee && !hasTokopedia && (
             <span style={{ fontFamily: '"VT323", monospace', fontSize: '14px', color: '#b89ee8' }}>-- NO LINK --</span>
+          )}
+          {isSold && (
+            <span style={{ fontFamily: '"VT323", monospace', fontSize: '14px', color: '#8a7a6a' }}>-- SOLD OUT --</span>
           )}
         </div>
       </div>
