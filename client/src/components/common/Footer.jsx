@@ -1,84 +1,75 @@
-import { Gamepad2, Instagram, Twitter, Youtube, Star } from 'lucide-react';
+import { Gamepad2, Instagram, Twitter, Youtube } from 'lucide-react';
+
+const SigilFooter = () => (
+  <svg width="64" height="64" viewBox="0 0 64 64" fill="none" style={{ color: '#585046', opacity: 0.1 }}>
+    <circle cx="32" cy="32" r="28" stroke="currentColor" strokeWidth="0.5" />
+    <circle cx="32" cy="32" r="18" stroke="currentColor" strokeWidth="0.4" />
+    <circle cx="32" cy="32" r="5"  stroke="currentColor" strokeWidth="0.7" />
+    <line x1="32" y1="4"  x2="32" y2="60" stroke="currentColor" strokeWidth="0.4" />
+    <line x1="4"  y1="32" x2="60" y2="32" stroke="currentColor" strokeWidth="0.4" />
+    <line x1="12" y1="12" x2="52" y2="52" stroke="currentColor" strokeWidth="0.3" />
+    <line x1="52" y1="12" x2="12" y2="52" stroke="currentColor" strokeWidth="0.3" />
+    <circle cx="32" cy="4"  r="1.5" fill="currentColor" />
+    <circle cx="32" cy="60" r="1.5" fill="currentColor" />
+    <circle cx="4"  cy="32" r="1.5" fill="currentColor" />
+    <circle cx="60" cy="32" r="1.5" fill="currentColor" />
+  </svg>
+);
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="relative overflow-hidden" style={{
-      background: 'linear-gradient(180deg, #e8deff 0%, #f0eaff 100%)',
-      borderTop: '3px solid #b89ee8',
-    }}>
-      {/* Top pastel rainbow stripe */}
-      <div className="h-1.5 w-full" style={{
-        background: 'linear-gradient(90deg, #f5a8d0, #c9a8f5, #a8d8f5, #a8e8c8, #f5e8a8, #f5c8a8, #f0b8c8, #f5a8d0)',
-        backgroundSize: '200% auto',
-        animation: 'rainbowShift 3s linear infinite',
-      }} />
+    <footer className="relative overflow-hidden" style={{ background: '#bfbaa7', borderTop: '1px solid #a8a390' }}>
+      <div className="h-px w-full" style={{ background: 'linear-gradient(90deg, transparent, #a8a390, #585046, #a8a390, transparent)' }} />
 
-      {/* Soft starfield bg */}
-      <div className="absolute inset-0 pointer-events-none opacity-40" style={{
-        backgroundImage: 'radial-gradient(2px 2px at 10% 20%, #f5a8d0, transparent), radial-gradient(2px 2px at 40% 60%, #c9a8f5, transparent), radial-gradient(2px 2px at 70% 30%, #a8d8f5, transparent), radial-gradient(2px 2px at 88% 75%, #a8e8c8, transparent)',
-      }} />
+      {/* Background sigils */}
+      <div className="absolute top-6 left-6 pointer-events-none"><SigilFooter /></div>
+      <div className="absolute top-6 right-6 pointer-events-none" style={{ transform: 'scaleX(-1)' }}><SigilFooter /></div>
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 pointer-events-none"><SigilFooter /></div>
 
       <div className="container mx-auto px-4 py-12 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
 
           {/* Brand */}
           <div className="col-span-1 md:col-span-2">
-            <div className="flex items-center gap-3 mb-4">
-              <Gamepad2 className="w-7 h-7 animate-float" style={{ color: '#c9a8f5', filter: 'drop-shadow(0 0 6px #c9a8f5)' }} />
+            <div className="flex items-center gap-2.5 mb-4">
+              <Gamepad2 className="w-6 h-6" style={{ color: '#3b3833' }} />
               <div>
-                <div className="text-[11px] font-black tracking-widest text-rainbow" style={{ fontFamily: '"Press Start 2P", monospace' }}>
+                <div style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '10px', color: '#040405', letterSpacing: '0.15em' }}>
                   GAMER
                 </div>
-                <div className="text-[8px] tracking-[0.3em]" style={{ fontFamily: '"Orbitron", sans-serif', color: '#5a3d8a' }}>
+                <div style={{ fontFamily: '"Orbitron", sans-serif', fontSize: '7px', color: '#585046', letterSpacing: '0.25em' }}>
                   HANDHELD
                 </div>
               </div>
             </div>
-            <p style={{ fontFamily: '"VT323", monospace', fontSize: '18px', color: '#4a3070', letterSpacing: '0.05em', lineHeight: '1.5' }}>
+            <p style={{ fontFamily: '"VT323", monospace', fontSize: '17px', color: '#585046', letterSpacing: '0.06em', lineHeight: 1.6 }}>
               Showroom untuk para pecinta gaming handheld.<br />
-              Temukan koleksi PSP, DS, PS Vita, dan lainnya!
+              Temukan koleksi PSP, DS, PS Vita, dan lainnya.
             </p>
-            {/* Status */}
-            <div className="flex items-center gap-2 mt-4">
-              <span className="w-2 h-2 rounded-full animate-blink" style={{ background: '#2a9a60', boxShadow: '0 0 5px #a8e8c8' }} />
-              <span style={{
-                fontFamily: '"Press Start 2P", monospace',
-                fontSize: '7px',
-                color: '#2a9a60',
-                textShadow: '0 0 5px #a8e8c8',
-                letterSpacing: '0.15em',
-              }}>
-                ONLINE
+            <div className="flex items-center gap-2 mt-5">
+              <span className="w-1.5 h-1.5 animate-blink" style={{ background: '#3b3833', display: 'inline-block' }} />
+              <span style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '7px', color: '#585046', letterSpacing: '0.2em' }}>
+                SYSTEM ONLINE
               </span>
             </div>
           </div>
 
-          {/* Quick Links */}
+          {/* Navigation */}
           <div>
-            <h4 className="mb-4" style={{
-              fontFamily: '"Press Start 2P", monospace',
-              fontSize: '8px',
-              color: '#3a80c0',
-              textShadow: '0 0 5px #a8d8f5',
-              letterSpacing: '0.2em',
-            }}>
-              ★ MENU ★
+            <h4 style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '8px', color: '#3b3833', letterSpacing: '0.2em', marginBottom: '16px' }}>
+              ◈ MENU
             </h4>
             <ul className="space-y-3">
-              {[
-                { label: 'HOME',     color: '#c0406a' },
-                { label: 'PRODUCTS', color: '#3a80c0' },
-                { label: 'ABOUT',    color: '#2a9a60' },
-              ].map(({ label, color }) => (
+              {['HOME', 'PRODUCTS', 'ABOUT'].map(label => (
                 <li key={label}>
-                  <a href="#" className="flex items-center gap-2 group transition-all"
-                    style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '8px', color: '#5a3d8a', letterSpacing: '0.1em', textDecoration: 'none' }}
-                    onMouseEnter={e => { e.currentTarget.style.color = color; }}
-                    onMouseLeave={e => { e.currentTarget.style.color = '#b89ee8'; }}
+                  <a href="#"
+                    style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '8px', color: '#8a7a60', letterSpacing: '0.1em', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '6px', transition: 'color 0.15s' }}
+                    onMouseEnter={e => { e.currentTarget.style.color = '#040405'; }}
+                    onMouseLeave={e => { e.currentTarget.style.color = '#8a7a60'; }}
                   >
-                    <Star className="w-2 h-2 opacity-0 group-hover:opacity-100 transition-opacity" fill="currentColor" />
+                    <span style={{ color: '#a8a390' }}>›</span>
                     {label}
                   </a>
                 </li>
@@ -88,31 +79,16 @@ const Footer = () => {
 
           {/* Social */}
           <div>
-            <h4 className="mb-4" style={{
-              fontFamily: '"Press Start 2P", monospace',
-              fontSize: '8px',
-              color: '#9060d0',
-              textShadow: '0 0 5px #c9a8f5',
-              letterSpacing: '0.2em',
-            }}>
-              ★ SOCIAL ★
+            <h4 style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '8px', color: '#3b3833', letterSpacing: '0.2em', marginBottom: '16px' }}>
+              ◈ SOCIAL
             </h4>
             <div className="flex gap-3">
-              {[
-                { Icon: Instagram, color: '#f5a8d0' },
-                { Icon: Twitter,   color: '#a8d8f5' },
-                { Icon: Youtube,   color: '#f5c8a8' },
-              ].map(({ Icon, color }, i) => (
+              {[Instagram, Twitter, Youtube].map((Icon, i) => (
                 <a key={i} href="#"
-                  className="w-9 h-9 flex items-center justify-center transition-all hover:-translate-y-1"
-                  style={{
-                    background: 'linear-gradient(135deg, #f0eaff, #e8deff)',
-                    border: `2px solid ${color}`,
-                    boxShadow: `2px 2px 0 #c0b0e0, 0 0 8px ${color}40`,
-                    color,
-                  }}
-                  onMouseEnter={e => { e.currentTarget.style.boxShadow = `2px 2px 0 #c0b0e0, 0 0 14px ${color}`; }}
-                  onMouseLeave={e => { e.currentTarget.style.boxShadow = `2px 2px 0 #c0b0e0, 0 0 8px ${color}40`; }}
+                  className="w-9 h-9 flex items-center justify-center transition-all hover:-translate-y-0.5"
+                  style={{ background: '#ccc7b5', border: '1px solid #a8a390', boxShadow: '2px 2px 0 #a8a390', color: '#585046' }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = '#3b3833'; e.currentTarget.style.color = '#040405'; e.currentTarget.style.background = '#dedad0'; }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = '#a8a390'; e.currentTarget.style.color = '#585046'; e.currentTarget.style.background = '#ccc7b5'; }}
                 >
                   <Icon className="w-4 h-4" />
                 </a>
@@ -122,17 +98,16 @@ const Footer = () => {
 
         </div>
 
-        {/* Bottom bar */}
-        <div className="mt-10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3" style={{ borderTop: '2px solid #c9a8f5' }}>
-          <p style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '7px', color: '#5a3d8a', letterSpacing: '0.1em' }}>
+        <div className="mt-10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3" style={{ borderTop: '1px solid #a8a390' }}>
+          <p style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '7px', color: '#8a7a60', letterSpacing: '0.1em' }}>
             &copy; {currentYear} GAMERHANDHELD. ALL RIGHTS RESERVED.
           </p>
           <div className="flex items-center gap-2">
-            <Star className="w-2.5 h-2.5" fill="currentColor" style={{ color: '#f5a8d0', filter: 'drop-shadow(0 0 3px #f5a8d0)' }} />
-            <p style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '7px', color: '#5a3d8a', letterSpacing: '0.1em' }}>
-              v2.0 Y2K EDITION
+            <div style={{ width: 5, height: 5, background: '#8a7a60', transform: 'rotate(45deg)' }} />
+            <p style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '7px', color: '#8a7a60', letterSpacing: '0.1em' }}>
+              v2.0 NieR EDITION
             </p>
-            <Star className="w-2.5 h-2.5" fill="currentColor" style={{ color: '#a8d8f5', filter: 'drop-shadow(0 0 3px #a8d8f5)' }} />
+            <div style={{ width: 5, height: 5, background: '#8a7a60', transform: 'rotate(45deg)' }} />
           </div>
         </div>
       </div>
