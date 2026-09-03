@@ -1,21 +1,62 @@
-import { useRef } from 'react';
 import Navbar from '../components/common/Navbar';
 import Footer from '../components/common/Footer';
 import ProductCarousel from '../components/carousel/ProductCarousel';
 import HandheldShowcase from '../components/3D/HandheldShowcase';
-import { Gamepad2, Star, ChevronDown } from 'lucide-react';
+import { Gamepad2, ChevronDown } from 'lucide-react';
 
-const stats = [
-  { value: '50+', label: 'DEVICES',   color: '#9060d0', glow: '#c9a8f5' },
-  { value: '99%', label: 'AUTHENTIC', color: '#3a80c0', glow: '#a8d8f5' },
-  { value: '24H', label: 'SUPPORT',   color: '#2a9a60', glow: '#a8e8c8' },
-];
+import sigil1 from '../assets/sigils/cybersigilism.png';
+import sigil2 from '../assets/sigils/cybersigilism2.png';
+import sigil3 from '../assets/sigils/cybersigilism3.jpg';
+import sigil4 from '../assets/sigils/cybersigilism4.png';
+import sigil5 from '../assets/sigils/cybersigilism5.png';
 
-const StarDeco = ({ className, size = 16, color, delay = '0s' }) => (
-  <Star
-    className={`absolute animate-float opacity-70 pointer-events-none ${className}`}
-    style={{ width: size, height: size, color, filter: `drop-shadow(0 0 5px ${color})`, animationDelay: delay }}
-    fill="currentColor"
+const Sigil = ({
+  src,
+  className = '',
+  size = 160,
+  opacity = 0,
+  delay = '0s',
+  duration = '7s',
+  rotate = 0,
+  flipX = false,
+  flipY = false,
+}) => (
+  <img
+    src={src}
+    alt=""
+    aria-hidden="true"
+    draggable={false}
+    className={`absolute pointer-events-none select-none hidden sm:block ${className}`}
+    style={{
+      width: size,
+      height: 'auto',
+      opacity,
+      mixBlendMode: 'multiply',
+      filter: 'grayscale(1)',
+      animation: `sigilFade ${duration} ease-in-out infinite`,
+      animationDelay: delay,
+      transform: `rotate(${rotate}deg) scaleX(${flipX ? -1 : 1}) scaleY(${flipY ? -1 : 1})`,
+      transformOrigin: 'center',
+    }}
+  />
+);
+
+/* Small inline sigil used mid-divider, next to text — not absolutely positioned */
+const SigilMark = ({ src, size = 20, opacity = 0.5, rotate = 0 }) => (
+  <img
+    src={src}
+    alt=""
+    aria-hidden="true"
+    draggable={false}
+    className="select-none"
+    style={{
+      width: size,
+      height: 'auto',
+      opacity,
+      mixBlendMode: 'multiply',
+      filter: 'grayscale(1)',
+      transform: `rotate(${rotate}deg)`,
+    }}
   />
 );
 
@@ -24,116 +65,105 @@ const MainPage = () => {
     document.getElementById('showcase')?.scrollIntoView({ behavior: 'smooth' });
 
   return (
-    <div className="min-h-screen overflow-x-hidden" style={{ background: '#f0eaff', color: '#4a3570' }}>
+    <div className="min-h-screen overflow-x-hidden" style={{ background: '#e6e1d1', color: '#040405' }}>
       <Navbar />
 
-      {/* pt-20: 56px bar + 24px ticker */}
-      <main className="pt-20">
+      <main className="pt-[82px]">
 
         {/* ── HERO ── */}
-        <section className="relative min-h-[88vh] flex flex-col items-center justify-center overflow-hidden starfield">
-          {/* Soft gradient bg */}
+        <section className="relative min-h-[90vh] flex flex-col items-center justify-center overflow-hidden">
+          {/* Subtle radial */}
           <div className="absolute inset-0 pointer-events-none" style={{
-            background: 'radial-gradient(ellipse at 50% -5%, #c9a8f550 0%, transparent 55%), radial-gradient(ellipse at 15% 85%, #a8d8f530 0%, transparent 45%), linear-gradient(180deg, #f0eaff 0%, #e8deff 100%)',
+            background: 'radial-gradient(ellipse at 50% 0%, rgba(88,80,70,0.08) 0%, transparent 55%), linear-gradient(180deg, #e6e1d1 0%, #dedad0 100%)',
           }} />
 
-          {/* Floating star decorations */}
-          <StarDeco className="top-16 left-14"    size={18} color="#f5a8d0" delay="0s"   />
-          <StarDeco className="top-28 right-16"   size={12} color="#c9a8f5" delay="0.5s" />
-          <StarDeco className="top-44 left-1/4"   size={14} color="#a8e8c8" delay="1s"   />
-          <StarDeco className="bottom-44 right-14" size={18} color="#f5e8a8" delay="0.8s" />
-          <StarDeco className="bottom-36 left-20"  size={12} color="#a8d8f5" delay="1.5s" />
-          <StarDeco className="top-36 right-1/4"   size={10} color="#f5c8a8" delay="0.3s" />
-          <StarDeco className="bottom-20 left-1/3" size={10} color="#f0b8c8" delay="1.2s" />
+          {/* Thin vertical rules */}
+          <div className="absolute top-0 bottom-0 left-8 w-px pointer-events-none" style={{ background: 'linear-gradient(180deg, transparent, #bfbaa7, transparent)' }} />
+          <div className="absolute top-0 bottom-0 right-8 w-px pointer-events-none" style={{ background: 'linear-gradient(180deg, transparent, #bfbaa7, transparent)' }} />
 
-          {/* Soft horizontal lines */}
-          <div className="absolute top-1/3 left-0 right-0 h-px opacity-30 pointer-events-none"
-            style={{ background: 'linear-gradient(90deg, transparent, #c9a8f5, #a8d8f5, transparent)' }} />
-          <div className="absolute bottom-1/3 left-0 right-0 h-px opacity-20 pointer-events-none"
-            style={{ background: 'linear-gradient(90deg, transparent, #a8e8c8, #f5a8d0, transparent)' }} />
+          {/* Sigil decorations — scattered around the edges so they never
+              collide with the centered headline / CTA */}
+          {/* <Sigil src={sigil2} className="top-14 left-6 md:left-10" size={150} opacity={0.10} delay="0s"   duration="8s" rotate={-4} />
+          <Sigil src={sigil4} className="top-16 right-6 md:right-14" size={120} opacity={0.09} delay="1.5s" duration="9s" rotate={12} />
+          <Sigil src={sigil5} className="top-1/3 left-4 md:left-10 hidden lg:block" size={110} opacity={0.07} delay="3s" duration="7s" rotate={-16} flipX />
+          <Sigil src={sigil3} className="bottom-1/3 right-4 md:right-12 hidden lg:block" size={130} opacity={0.08} delay="0.8s" duration="10s" rotate={9} />
+          <Sigil src={sigil4} className="bottom-20 left-8 md:left-16" size={105} opacity={0.08} delay="2s" duration="8s" rotate={-160} flipY />
+          <Sigil src={sigil5} className="bottom-14 right-8 md:right-16" size={115} opacity={0.07} delay="4s" duration="7s" rotate={18} /> */}
+          <Sigil src={sigil1} className="top-[10px] left-[-10px] md:right-6 -translate-y-1/2 opacity-0 lg:block`" size={350} opacity={0} delay="1s" duration="11s" />
+          <Sigil src={sigil5} className="bottom-4 right-2 md:right-6 -translate-y-1/2lg:block" size={350} opacity={0} delay="1s" rotate={180} invert={true} duration="11s" />
+
 
           <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
 
             {/* Badge */}
-            <div className="inline-flex items-center gap-2 mb-8 px-4 py-1.5 border-2" style={{
-              borderColor: '#c9a8f5',
-              background: '#c9a8f520',
-              boxShadow: '0 0 10px #c9a8f540, 2px 2px 0 #b89ee8',
+            <div className="inline-flex items-center gap-2 mb-8 px-4 py-1.5" style={{
+              border: '1px solid #bfbaa7',
+              background: 'rgba(88,80,70,0.06)',
             }}>
-              <span className="w-2 h-2 rounded-full animate-blink" style={{ background: '#a8e8c8', boxShadow: '0 0 6px #a8e8c8' }} />
-              <span className="text-[8px] tracking-[0.35em]" style={{
-                fontFamily: '"Press Start 2P", monospace',
-                color: '#2a9a60',
-                textShadow: '0 0 6px #a8e8c8',
-              }}>
-                ★ PLAYER ONE START ★
+              <span className="w-1.5 h-1.5 animate-blink" style={{ background: '#585046', display: 'inline-block' }} />
+              <span style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '7px', color: '#585046', letterSpacing: '0.3em' }}>
+                SYSTEM ONLINE
               </span>
             </div>
 
-            {/* Main title */}
+            {/* Title */}
             <div className="mb-2">
-              <h1
-                className="font-black leading-none tracking-tight"
-                style={{
-                  fontFamily: '"Orbitron", sans-serif',
-                  fontSize: 'clamp(36px, 7vw, 72px)',
-                  background: 'linear-gradient(180deg, #4c1d95 0%, #7c3aed 50%, #9333ea 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                  filter: 'drop-shadow(0 2px 10px rgba(124, 58, 237, 0.25))',
-                }}
-              >
-                GAMING
+              <h1 style={{
+                fontFamily: '"Orbitron", sans-serif',
+                fontSize: 'clamp(36px, 7vw, 72px)',
+                fontWeight: 900,
+                lineHeight: 1,
+                letterSpacing: '-0.02em',
+                color: '#040405',
+              }}>
+                GAMES
               </h1>
-              <h1
-                className="font-black leading-none tracking-tight"
-                style={{
-                  fontFamily: '"Orbitron", sans-serif',
-                  fontSize: 'clamp(36px, 7vw, 72px)',
-                  background: 'linear-gradient(90deg, #ec4899, #8b5cf6, #06b6d4, #10b981, #f59e0b, #ec4899)',
-                  backgroundSize: '200% auto',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                  animation: 'rainbowShift 4s linear infinite',
-                  filter: 'drop-shadow(0 2px 8px rgba(139, 92, 246, 0.25))',
-                }}
-              >
-                HANDHELD
+              <h1 style={{
+                fontFamily: '"Orbitron", sans-serif',
+                fontSize: 'clamp(36px, 7vw, 72px)',
+                fontWeight: 900,
+                lineHeight: 1,
+                letterSpacing: '-0.02em',
+                background: 'linear-gradient(90deg, #3b3833, #040405, #585046, #040405, #3b3833)',
+                backgroundSize: '200% auto',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+                animation: 'rainbowShift 6s linear infinite',
+              }}>
+                VAULT
               </h1>
-              <p className="mt-3 tracking-[0.5em]" style={{
+              <p className="mt-4" style={{
                 fontFamily: '"Press Start 2P", monospace',
-                fontSize: 'clamp(9px, 1.8vw, 16px)',
-                color: '#3a80c0',
-                textShadow: '0 0 8px #a8d8f5',
+                fontSize: 'clamp(8px, 1.5vw, 13px)',
+                color: '#8a7a60',
+                letterSpacing: '0.5em',
               }}>
                 S H O W R O O M
               </p>
             </div>
 
-            {/* Star divider */}
-            <div className="flex items-center justify-center gap-3 my-8">
-              <div className="h-px flex-1 max-w-24" style={{ background: 'linear-gradient(90deg, transparent, #f5a8d0)' }} />
-              <Star className="w-4 h-4 animate-spin-slow" fill="currentColor" style={{ color: '#f5a8d0', filter: 'drop-shadow(0 0 5px #f5a8d0)' }} />
-              <Star className="w-3 h-3" fill="currentColor" style={{ color: '#c9a8f5', filter: 'drop-shadow(0 0 4px #c9a8f5)' }} />
-              <Star className="w-4 h-4 animate-spin-slow" fill="currentColor" style={{ color: '#a8d8f5', filter: 'drop-shadow(0 0 5px #a8d8f5)', animationDirection: 'reverse' }} />
-              <div className="h-px flex-1 max-w-24" style={{ background: 'linear-gradient(90deg, #f5a8d0, transparent)' }} />
+            {/* Divider */}
+            <div className="flex items-center justify-center gap-4 my-8">
+              <div className="h-px flex-1 max-w-28" style={{ background: 'linear-gradient(90deg, transparent, #bfbaa7)' }} />
+              <SigilMark src={sigil2} size={22} opacity={0.55} />
+              <div className="h-px flex-1 max-w-28" style={{ background: 'linear-gradient(90deg, #bfbaa7, transparent)' }} />
             </div>
 
+            {/* Body text */}
             <p className="max-w-xl mx-auto leading-relaxed mb-10" style={{
               fontFamily: '"VT323", monospace',
-              fontSize: 'clamp(16px, 2.5vw, 22px)',
-              color: '#4a3070',
-              letterSpacing: '0.05em',
+              fontSize: 'clamp(16px, 2.2vw, 21px)',
+              color: '#585046',
+              letterSpacing: '0.06em',
             }}>
               Temukan koleksi gaming handheld terbaik dari berbagai generasi.{' '}
-              <span style={{ color: '#3a80c0', textShadow: '0 0 5px #a8d8f5' }}>PSP, DS, PS Vita, 3DS</span>{' '}
-              dan masih banyak lagi!
-            </p>            
+              <span style={{ color: '#3b3833', fontWeight: 700 }}>PSP, DS, PS Vita, 3DS</span>{' '}
+              dan masih banyak lagi.
+            </p>
 
             {/* CTA */}
-            <button onClick={scrollToShowcase} className="btn-y2k inline-flex items-center gap-3">
+            <button onClick={scrollToShowcase} className="btn-nier inline-flex items-center gap-3">
               <Gamepad2 className="w-4 h-4" />
               EXPLORE NOW
             </button>
@@ -142,13 +172,11 @@ const MainPage = () => {
           {/* Scroll hint */}
           <button
             onClick={scrollToShowcase}
-            className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition-opacity animate-bounce"
+            className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 opacity-30 hover:opacity-70 transition-opacity animate-bounce"
             aria-label="Scroll down"
           >
-            <span className="text-[7px] tracking-widest" style={{ fontFamily: '"Press Start 2P", monospace', color: '#a8d8f5' }}>
-              SCROLL
-            </span>
-            <ChevronDown className="w-4 h-4" style={{ color: '#a8d8f5' }} />
+            <span style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '7px', color: '#8a7a60', letterSpacing: '0.25em' }}>SCROLL</span>
+            <ChevronDown className="w-4 h-4" style={{ color: '#8a7a60' }} />
           </button>
         </section>
 
@@ -158,46 +186,33 @@ const MainPage = () => {
         </section>
 
         {/* ── PRODUCTS ── */}
-        <section className="py-20 relative overflow-hidden" style={{ background: 'linear-gradient(180deg, #e8deff 0%, #f0eaff 100%)' }}>
-          <div className="absolute top-0 left-0 right-0 h-0.5" style={{ background: 'linear-gradient(90deg, transparent, #c9a8f5, #a8d8f5, transparent)' }} />
+        <section className="py-20 relative overflow-hidden" style={{ background: 'linear-gradient(180deg, #dedad0 0%, #e6e1d1 100%)' }}>
+          <div className="absolute top-0 left-0 right-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, #bfbaa7, #585046, #bfbaa7, transparent)' }} />
+
+          <Sigil src={sigil3} className="top-6 left-6 md:left-10" size={110} opacity={0.08} delay="0s" duration="9s" rotate={-6} />
+          <Sigil src={sigil1} className="bottom-6 right-6 md:right-10" size={90} opacity={0.07} delay="2s" duration="10s" rotate={180} />
 
           <div className="max-w-7xl mx-auto px-4">
             <div className="text-center mb-14">
-              <p className="text-[8px] tracking-[0.5em] mb-4" style={{
-                fontFamily: '"Press Start 2P", monospace',
-                color: '#2a9a60',
-                textShadow: '0 0 6px #a8e8c8',
-              }}>
-                ★ ITEM SELECT ★
+              <p style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '8px', color: '#8a7a60', letterSpacing: '0.4em', marginBottom: '12px' }}>
+                ◈ INVENTORY ◈
               </p>
-              <h2 className="font-black text-rainbow" style={{
-                fontFamily: '"Orbitron", sans-serif',
-                fontSize: 'clamp(24px, 5vw, 48px)',
-                background: 'linear-gradient(90deg, #ec4899, #8b5cf6, #06b6d4, #10b981, #f59e0b, #ec4899)',
-                backgroundSize: '200% auto',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-                animation: 'rainbowShift 4s linear infinite',
-                filter: 'drop-shadow(0 2px 8px rgba(139, 92, 246, 0.25))',
-              }}>
+              <h2 style={{ fontFamily: '"Orbitron", sans-serif', fontSize: 'clamp(24px, 5vw, 46px)', fontWeight: 900, color: '#040405' }}>
                 OUR PRODUCTS
               </h2>
-              <div className="flex items-center justify-center gap-3 mt-5">
-                <div className="h-0.5 w-16" style={{ background: 'linear-gradient(90deg, transparent, #f5a8d0)' }} />
-                <Star className="w-3 h-3" fill="currentColor" style={{ color: '#f5a8d0', filter: 'drop-shadow(0 0 4px #f5a8d0)' }} />
-                <Star className="w-4 h-4" fill="currentColor" style={{ color: '#f5e8a8', filter: 'drop-shadow(0 0 5px #f5e8a8)' }} />
-                <Star className="w-3 h-3" fill="currentColor" style={{ color: '#a8d8f5', filter: 'drop-shadow(0 0 4px #a8d8f5)' }} />
-                <div className="h-0.5 w-16" style={{ background: 'linear-gradient(90deg, #f5a8d0, transparent)' }} />
+              <div className="flex items-center justify-center gap-4 mt-5">
+                <div className="h-px w-20" style={{ background: 'linear-gradient(90deg, transparent, #bfbaa7)' }} />
+                <SigilMark src={sigil5} size={18} opacity={0.6} rotate={90} />
+                <div className="h-px w-20" style={{ background: 'linear-gradient(90deg, #bfbaa7, transparent)' }} />
               </div>
-              <p className="mt-4" style={{ fontFamily: '"VT323", monospace', fontSize: '20px', color: '#4a3070', letterSpacing: '0.08em' }}>
+              <p className="mt-4" style={{ fontFamily: '"VT323", monospace', fontSize: '19px', color: '#8a7a60', letterSpacing: '0.1em' }}>
                 Koleksi handheld terbaik untuk kamu
               </p>
             </div>
             <ProductCarousel />
           </div>
 
-          <div className="absolute bottom-0 left-0 right-0 h-0.5" style={{ background: 'linear-gradient(90deg, transparent, #a8d8f5, #c9a8f5, transparent)' }} />
+          <div className="absolute bottom-0 left-0 right-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, #bfbaa7, #585046, #bfbaa7, transparent)' }} />
         </section>
 
       </main>
