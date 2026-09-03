@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Gamepad2, LogOut, Menu, X } from 'lucide-react';
+import { Gamepad2, LogOut } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { publicApi } from '../../api/axios';
 import toast from 'react-hot-toast';
@@ -16,9 +16,9 @@ const SigilIcon = () => (
   </svg>
 );
 
-const PromoForm = ({ promoCode, setPromoCode, onSubmit, isLoading, className = '', inputWidth = 'w-52' }) => (
+const PromoForm = ({ promoCode, setPromoCode, onSubmit, isLoading, className = '' }) => (
   <form onSubmit={onSubmit} className={`flex items-center gap-2 ${className}`}>
-    <div className={`relative ${inputWidth}`}>
+    <div className="relative flex-1 min-w-[120px]">
       <span className="absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none">
         <SigilIcon />
       </span>
@@ -39,7 +39,7 @@ const PromoForm = ({ promoCode, setPromoCode, onSubmit, isLoading, className = '
         disabled={isLoading}
       />
     </div>
-    <button type="submit" disabled={isLoading} className="btn-nier py-1.5 px-4 text-[8px] disabled:opacity-40">
+    <button type="submit" disabled={isLoading} className="btn-nier py-1.5 px-4 text-[8px] disabled:opacity-40 whitespace-nowrap">
       {isLoading ? '...' : 'REDEEM'}
     </button>
   </form>
@@ -48,7 +48,6 @@ const PromoForm = ({ promoCode, setPromoCode, onSubmit, isLoading, className = '
 const Navbar = () => {
   const [promoCode, setPromoCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
   const { isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -93,12 +92,12 @@ const Navbar = () => {
       {/* Main bar */}
       <div style={{ background: 'linear-gradient(180deg, #e6e1d1 0%, #dedad0 100%)', borderBottom: '1px solid #bfbaa7', boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}>
         <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-center justify-between h-14 gap-4">
+          <div className="flex items-center justify-between h-14 gap-3">
 
-            {/* Logo */}
+            {/* Logo - KIRI */}
             <div
               className="flex items-center gap-2.5 shrink-0 cursor-pointer group"
-              onClick={() => { navigate('/'); setMenuOpen(false); }}
+              onClick={() => navigate('/')}
             >
               <Gamepad2 className="w-6 h-6 transition-all group-hover:scale-110" style={{ color: '#3b3833' }} />
               <div className="flex flex-col leading-none">
@@ -111,14 +110,14 @@ const Navbar = () => {
               </div>
             </div>
 
-            {/* Promo form — desktop */}
+            {/* Promo form */}
             {!isAdminPage && (
-              <div className="hidden md:block">
-                <PromoForm promoCode={promoCode} setPromoCode={setPromoCode} onSubmit={handleRedeem} isLoading={isLoading} inputWidth="w-52" />
+              <div className="flex-1 max-w-md mx-4">
+                <PromoForm promoCode={promoCode} setPromoCode={setPromoCode} onSubmit={handleRedeem} isLoading={isLoading} />
               </div>
             )}
 
-            {/* Right side */}
+            {/* Right side - KANAN (Admin/Logout) */}
             <div className="flex items-center gap-2 shrink-0">
               {isAdminPage && isAuthenticated && (
                 <>
@@ -139,28 +138,11 @@ const Navbar = () => {
                   </button>
                 </>
               )}
-              {!isAdminPage && (
-                <button
-                  className="md:hidden p-1.5 transition-all"
-                  style={{ border: '1px solid #bfbaa7', color: '#585046', background: 'transparent' }}
-                  onClick={() => setMenuOpen(p => !p)}
-                  aria-label="Toggle menu"
-                >
-                  {menuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
-                </button>
-              )}
             </div>
 
           </div>
         </div>
       </div>
-
-      {/* Mobile dropdown */}
-      {!isAdminPage && menuOpen && (
-        <div className="md:hidden px-4 py-3 flex justify-center" style={{ background: '#dedad0', borderBottom: '1px solid #bfbaa7' }}>
-          <PromoForm promoCode={promoCode} setPromoCode={setPromoCode} onSubmit={handleRedeem} isLoading={isLoading} className="w-full max-w-sm" inputWidth="flex-1" />
-        </div>
-      )}
 
       {/* Ticker */}
       {!isAdminPage && (
