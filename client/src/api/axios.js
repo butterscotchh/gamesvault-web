@@ -3,14 +3,15 @@ import axios from 'axios';
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
 // ============ INSTANCE UNTUK PROTECTED ROUTES ============
-// Pake token JWT (untuk admin)
 const api = axios.create({
   baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
+  timeout: 10000, // 10 detik timeout
 });
 
+// ─── INTERCEPTOR REQUEST ───
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('adminToken');
@@ -19,16 +20,39 @@ api.interceptors.request.use(
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => {
+    console.error('❌ Request interceptor error:', error);
+    return Promise.reject(error);
+  }
+);
+
+// ─── INTERCEPTOR RESPONSE ───
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    // Kalo token expired (401), logout otomatis
+    if (error.response?.status === 401) {
+      const token = localStorage.getItem('adminToken');
+      if (token) {
+        console.warn('⚠️ Token expired, logging out...');
+        localStorage.removeItem('adminToken');
+        // Redirect ke login kalo di halaman admin
+        if (window.location.pathname.startsWith('/admin')) {
+          window.location.href = '/login';
+        }
+      }
+    }
+    return Promise.reject(error);
+  }
 );
 
 // ============ INSTANCE UNTUK PUBLIC ROUTES ============
-// GA pake token (untuk login, promo, get products)
 const publicApi = axios.create({
   baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
+  timeout: 10000,
 });
 
 export { api, publicApi };

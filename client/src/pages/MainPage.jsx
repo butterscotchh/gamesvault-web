@@ -139,7 +139,7 @@ const MainPage = () => {
                 color: '#8a7a60',
                 letterSpacing: '0.5em',
               }}>
-                S H O W R O O M
+                C A T A L O G U E
               </p>
             </div>
 
@@ -168,16 +168,6 @@ const MainPage = () => {
               EXPLORE NOW
             </button>
           </div>
-
-          {/* Scroll hint */}
-          <button
-            onClick={scrollToShowcase}
-            className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 opacity-30 hover:opacity-70 transition-opacity animate-bounce"
-            aria-label="Scroll down"
-          >
-            <span style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '7px', color: '#8a7a60', letterSpacing: '0.25em' }}>SCROLL</span>
-            <ChevronDown className="w-4 h-4" style={{ color: '#8a7a60' }} />
-          </button>
         </section>
 
         {/* ── 3D SHOWCASE ── */}
