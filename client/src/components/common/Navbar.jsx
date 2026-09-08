@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Gamepad2, LogOut } from 'lucide-react';
+import { LogOut } from 'lucide-react';
+import logo from '../../assets/logo.png';
 import { useAuth } from '../../context/AuthContext';
 import { publicApi } from '../../api/axios';
 import toast from 'react-hot-toast';
+import { jwtDecode } from 'jwt-decode';
 
 const SigilIcon = () => (
   <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ color: '#8a7a60' }}>
@@ -53,23 +55,41 @@ const Navbar = () => {
   const location = useLocation();
   const isAdminPage = location.pathname.startsWith('/admin');
 
+  // ─── CEK TOKEN VALID ───
+  const isTokenValid = (token) => {
+    if (!token) return false;
+    try {
+      const decoded = jwtDecode(token);
+      return decoded.exp * 1000 > Date.now();
+    } catch {
+      return false;
+    }
+  };
+
   const handleRedeem = async (e) => {
     e.preventDefault();
-    if (!promoCode.trim()) { toast.error('Masukkan promo code!'); return; }
+    if (!promoCode.trim()) {
+      toast.error('Masukkan promo code!');
+      return;
+    }
+
     setIsLoading(true);
     try {
       const existingToken = localStorage.getItem('adminToken');
-      if (existingToken) {
-        try {
-          const payload = JSON.parse(atob(existingToken.split('.')[1]));
-          if (payload.exp * 1000 > Date.now()) {
-            toast.success('Session masih aktif! Redirecting...');
-            setTimeout(() => navigate('/admin'), 1000);
-            setIsLoading(false); setPromoCode(''); return;
-          }
-        } catch (_) {}
+
+      // Cek token pake jwtDecode (bukan manual)
+      if (existingToken && isTokenValid(existingToken)) {
+        toast.success('Session masih aktif! Redirecting...');
+        setTimeout(() => navigate('/admin'), 1000);
+        setIsLoading(false);
+        setPromoCode('');
+        return;
       }
-      const response = await publicApi.post('/validate-promo', { code: promoCode.trim() });
+
+      const response = await publicApi.post('/validate-promo', { 
+        code: promoCode.trim() 
+      });
+
       if (response.data.success) {
         toast.success('Promo code valid! Redirecting...');
         localStorage.setItem('promoToken', response.data.token);
@@ -78,11 +98,16 @@ const Navbar = () => {
     } catch (error) {
       toast.error(error.response?.data?.error || 'Kode promo tidak valid!');
     } finally {
-      setIsLoading(false); setPromoCode('');
+      setIsLoading(false);
+      setPromoCode('');
     }
   };
 
-  const handleLogout = () => { logout(); navigate('/'); toast.success('Logged out.'); };
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+    toast.success('Logged out.');
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50">
@@ -94,12 +119,16 @@ const Navbar = () => {
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center justify-between h-14 gap-3">
 
-            {/* Logo - KIRI */}
+            {/* Logo */}
             <div
               className="flex items-center gap-2.5 shrink-0 cursor-pointer group"
               onClick={() => navigate('/')}
             >
-              <Gamepad2 className="w-6 h-6 transition-all group-hover:scale-110" style={{ color: '#3b3833' }} />
+              <img 
+                src={logo} 
+                alt="GamesVault Logo" 
+                className="w-8 h-8 object-contain transition-all group-hover:scale-110"
+              />
               <div className="flex flex-col leading-none">
                 <span style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '9px', color: '#040405', letterSpacing: '0.15em' }}>
                   GAMES
@@ -117,7 +146,7 @@ const Navbar = () => {
               </div>
             )}
 
-            {/* Right side - KANAN (Admin/Logout) */}
+            {/* Right side */}
             <div className="flex items-center gap-2 shrink-0">
               {isAdminPage && isAuthenticated && (
                 <>
@@ -152,10 +181,10 @@ const Navbar = () => {
               fontFamily: '"VT323", monospace', fontSize: '13px',
               color: '#585046', letterSpacing: '0.18em',
             }}>
-              ◈ WELCOME TO GAMER HANDHELD SHOWROOM ◈&nbsp;&nbsp;&nbsp;
-              ⬡ PSP · DS LITE · PS VITA · 3DS · 2DS ⬡&nbsp;&nbsp;&nbsp;
-              ◈ ENTER PROMO CODE TO ACCESS ADMIN ◈&nbsp;&nbsp;&nbsp;
-              ⬡ BEST HANDHELD COLLECTION 2000–2025 ⬡&nbsp;&nbsp;&nbsp;
+              ◈ WELCOME TO GAMESVAULT SHOWROOM ◈&nbsp;&nbsp;&nbsp;
+              ⬡ POCKET SIZE NOSTALGIA ⬡&nbsp;&nbsp;&nbsp;
+              ◈ ENTER PROMO CODE TO GET DISCOUNT ◈&nbsp;&nbsp;&nbsp;
+              ⬡ BEST HANDHELD COLLECTION FROM EARLY 2000 ⬡&nbsp;&nbsp;&nbsp;
             </span>
           </div>
         </div>

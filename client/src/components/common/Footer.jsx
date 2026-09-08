@@ -1,4 +1,5 @@
-import { Gamepad2, Instagram, AtSign } from 'lucide-react';
+import { Instagram, AtSign } from 'lucide-react';
+import logo from '../../assets/logo.png'; // ← SESUAIKAN PATH
 
 // ─── TikTok SVG ───
 const TikTokIcon = ({ className = "w-5 h-5" }) => (
@@ -44,16 +45,20 @@ const Footer = () => {
       <div className="container mx-auto px-4 py-12 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
 
-          {/* Brand */}
+          {/* Brand - Pake Logo */}
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center gap-3 mb-4">
-              <Gamepad2 className="w-7 h-7" style={{ color: '#3b3833' }} />
+              <img 
+                src={logo} 
+                alt="GamesVault Logo" 
+                className="w-12 h-12 object-contain"
+              />
               <div>
                 <div style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '12px', color: '#040405', letterSpacing: '0.15em' }}>
-                  GAMER
+                  GAMES
                 </div>
                 <div style={{ fontFamily: '"Orbitron", sans-serif', fontSize: '8px', color: '#585046', letterSpacing: '0.25em' }}>
-                  HANDHELD
+                  VAULT
                 </div>
               </div>
             </div>
@@ -135,9 +140,6 @@ const Footer = () => {
           </p>
           <div className="flex items-center gap-2">
             <div style={{ width: 5, height: 5, background: '#8a7a60', transform: 'rotate(45deg)' }} />
-            <p style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '8px', color: '#8a7a60', letterSpacing: '0.1em' }}>
-              v2.0 NieR EDITION
-            </p>
             <div style={{ width: 5, height: 5, background: '#8a7a60', transform: 'rotate(45deg)' }} />
           </div>
         </div>

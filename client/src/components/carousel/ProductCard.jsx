@@ -1,4 +1,5 @@
-import { ShoppingBag, Store } from 'lucide-react';
+import shopeeLogo from '../../assets/shopee.png';
+import tokpedLogo from '../../assets/tokped.png';
 
 const SigilMark = () => (
   <svg width="10" height="10" viewBox="0 0 10 10" fill="none" style={{ color: '#8a7a60' }}>
@@ -75,7 +76,7 @@ const ProductCard = ({ product }) => {
         <div className="flex flex-wrap gap-1.5">
           {!isSold && hasShopee && (
             <a href={product.shopeeLink} target="_blank" rel="noopener noreferrer"
-              className="flex items-center gap-1 px-2 py-1 transition-all hover:-translate-y-0.5"
+              className="flex items-center gap-1.5 px-2 py-1 transition-all hover:-translate-y-0.5"
               style={{
                 fontFamily: '"Press Start 2P", monospace', fontSize: '7px',
                 background: 'linear-gradient(135deg, #ccc7b5, #bfbaa7)',
@@ -83,13 +84,13 @@ const ProductCard = ({ product }) => {
                 boxShadow: '2px 2px 0 #a8a390', letterSpacing: '0.05em',
               }}
             >
-              <ShoppingBag className="w-2.5 h-2.5" />
+              <img src={shopeeLogo} alt="Shopee" className="w-4 h-4 object-contain" />
               SHOPEE
             </a>
           )}
           {!isSold && hasTokopedia && (
             <a href={product.tokopediaLink} target="_blank" rel="noopener noreferrer"
-              className="flex items-center gap-1 px-2 py-1 transition-all hover:-translate-y-0.5"
+              className="flex items-center gap-1.5 px-2 py-1 transition-all hover:-translate-y-0.5"
               style={{
                 fontFamily: '"Press Start 2P", monospace', fontSize: '7px',
                 background: 'linear-gradient(135deg, #585046, #3b3833)',
@@ -97,7 +98,7 @@ const ProductCard = ({ product }) => {
                 boxShadow: '2px 2px 0 #3b3833', letterSpacing: '0.05em',
               }}
             >
-              <Store className="w-2.5 h-2.5" />
+              <img src={tokpedLogo} alt="Tokopedia" className="w-4 h-4 object-contain" />
               TOPED
             </a>
           )}

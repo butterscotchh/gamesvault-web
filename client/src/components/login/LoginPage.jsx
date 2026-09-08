@@ -9,14 +9,22 @@ const LoginPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [attempts, setAttempts] = useState(0);
   const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
+    // Validasi input
     if (!username.trim() || !password.trim()) {
       toast.error('Username dan password wajib diisi!');
+      return;
+    }
+
+    // Rate limiting lokal (tambahan)
+    if (attempts >= 5) {
+      toast.error('Terlalu banyak percobaan, coba lagi nanti!');
       return;
     }
 
@@ -34,8 +42,10 @@ const LoginPage = () => {
         navigate('/admin');
       }
     } catch (error) {
+      setAttempts(prev => prev + 1);
+      toast.error('Username atau password salah!');
+      
       console.error('Login error:', error);
-      toast.error(error.response?.data?.error || 'Username atau password salah!');
     } finally {
       setIsLoading(false);
     }
@@ -105,7 +115,7 @@ const LoginPage = () => {
 
             <button
               type="submit"
-              disabled={isLoading}
+              disabled={isLoading || attempts >= 5}
               className="w-full py-2 text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               style={{ 
                 background: '#2c2c2c',

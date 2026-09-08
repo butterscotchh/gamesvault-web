@@ -24,33 +24,37 @@ project-root/
 │   ├── src/
 │   │   ├── api/
 │   │   │   ├── axios.js                # ✅ Axios + JWT interceptor + publicApi
-│   │   │   └── firebase.js             # ⏳ NANTI (upload gambar)
-│   │   ├── assets/                      # 📁 Kosong
+│   │   │   └── firebase.js             # ✅ DONE
+│   │   ├── assets/
+│   │   │   ├── logo.png                # ✅ Logo
+│   │   │   ├── shopee.png              # ✅ Shopee logo
+│   │   │   ├── tokped.png              # ✅ Tokopedia logo
+│   │   │   └── sigils/                 # ✅ Cyber sigil assets
 │   │   ├── components/
 │   │   │   ├── 3D/
-│   │   │   │   ├── HandheldShowcase.jsx    # ✅ DONE (CP-3)
-│   │   │   │   └── DeviceModel.jsx         # ✅ DONE (CP-3)
+│   │   │   │   ├── HandheldShowcase.jsx    # ✅ DONE
+│   │   │   │   └── DeviceModel.jsx         # ✅ DONE
 │   │   │   ├── carousel/
-│   │   │   │   ├── ProductCarousel.jsx    # ✅ DONE (CP-4) + publicApi
-│   │   │   │   └── ProductCard.jsx        # ✅ DONE (CP-4)
+│   │   │   │   ├── ProductCarousel.jsx    # ✅ DONE (auto-slide OFF)
+│   │   │   │   └── ProductCard.jsx        # ✅ DONE (dengan SOLD overlay)
 │   │   │   ├── admin/
-│   │   │   │   ├── AdminPanel.jsx         # ✅ DONE (CP-6) + Home button
-│   │   │   │   └── ProductForm.jsx        # ✅ DONE (CP-6)
+│   │   │   │   ├── AdminPanel.jsx         # ✅ DONE
+│   │   │   │   └── ProductForm.jsx        # ✅ DONE
 │   │   │   ├── common/
-│   │   │   │   ├── Navbar.jsx             # ✅ DONE (CP-2) + conditional admin
-│   │   │   │   ├── Footer.jsx             # ✅ DONE (CP-2)
-│   │   │   │   └── ColorPicker.jsx        # ✅ DONE (CP-3)
+│   │   │   │   ├── Navbar.jsx             # ✅ DONE (Logo PNG, conditional)
+│   │   │   │   ├── Footer.jsx             # ✅ DONE (Logo PNG, socials)
+│   │   │   │   └── ColorPicker.jsx        # ✅ DONE
 │   │   │   └── login/
-│   │   │       └── LoginPage.jsx          # ✅ DONE (CP-5) + publicApi
+│   │   │       └── LoginPage.jsx          # ✅ DONE
 │   │   ├── context/
-│   │   │   └── AuthContext.jsx            # ✅ DONE
+│   │   │   └── AuthContext.jsx            # ✅ DONE (JWT decode + auto-logout)
 │   │   ├── pages/
-│   │   │   ├── MainPage.jsx               # ✅ DONE (Hero + 3D + Carousel)
-│   │   │   ├── AdminPage.jsx              # ✅ DONE (CP-6)
-│   │   │   └── AdminSettings.jsx          # ✅ DONE (CP-7) + clean navbar
+│   │   │   ├── MainPage.jsx               # ✅ DONE
+│   │   │   ├── AdminPage.jsx              # ✅ DONE (responsive card view)
+│   │   │   └── AdminSettings.jsx          # ✅ DONE
 │   │   ├── App.jsx                        # ✅ DONE
 │   │   ├── main.jsx                       # ✅ DONE
-│   │   └── index.css                      # ✅ CLEAN
+│   │   └── index.css                      # ✅ DONE
 │   ├── index.html
 │   ├── package.json                       # ✅ DONE
 │   ├── vite.config.js                     # ✅ DONE
@@ -60,15 +64,17 @@ project-root/
 │
 └── server/                                # ✅ DONE (CP-7)
     ├── src/
-    │   ├── server.js                      # ✅ DONE (Firebase + JWT + Settings)
-    │   └── firebase.js                    # ✅ DONE (Firebase Admin)
-    ├── data/                              # ❌ DELETED (pake Firestore)
+    │   ├── server.js                      # ✅ DONE (Security fixed)
+    │   ├── firebase.js                    # ✅ DONE (Security fixed)
+    │   └── logger.js                      # ✅ DONE (Winston logging)
+    ├── logs/                              # ✅ Auto-generated
+    │   ├── error.log
+    │   └── combined.log
     ├── .env                               # ✅ DONE
     ├── package.json                       # ✅ DONE
     ├── serviceAccountKey.json             # ✅ DONE
     ├── seed-admin.js                      # ✅ DONE
-    ├── add-admin.js                       # ✅ DONE
-    └── test-firebase.js                   # ❌ DELETED
+    └── add-admin.js                       # ✅ DONE
 
 
 USER FLOW (FINAL)
@@ -76,7 +82,7 @@ USER FLOW (FINAL)
 1. Main Page (/)
 User buka website
   ↓
-Hero Section (judul + tagline)
+Hero Section (judul + tagline + 3 tombol CTA)
   ↓
 3D Showcase (5 device dengan color picker)
   ↓
@@ -122,9 +128,7 @@ Logout → Hapus JWT → Redirect /
   ↓
 [←] [1][2][3][4] [→]
   ↓
-Next/Prev dengan loop
-  ↓
-Auto-slide setiap 5 detik
+Next/Prev manual (Auto-slide OFF)
   ↓
 Indicator dots di bawah
 
@@ -132,14 +136,29 @@ Indicator dots di bawah
 API ENDPOINTS (FINAL)
 ---------------------
 Method  Endpoint                  Auth     Instance   Deskripsi
-POST    /api/validate-promo       Public   publicApi  Validasi promo code
-POST    /api/login                Public   publicApi  Login admin → return JWT
+POST    /api/validate-promo       Public   publicApi  Validasi promo code (rate-limited)
+POST    /api/login                Public   publicApi  Login admin → return JWT (rate-limited)
 GET     /api/products             Public   publicApi  Ambil semua products
 GET     /api/products/:id         Public   publicApi  Ambil product by ID
-POST    /api/products             JWT      api        Tambah product
-PUT     /api/products/:id         JWT      api        Update product
+POST    /api/products             JWT      api        Tambah product (validated)
+PUT     /api/products/:id         JWT      api        Update product (validated)
 DELETE  /api/products/:id         JWT      api        Hapus product
-PUT     /api/admin/settings       JWT      api        Update username/password
+PUT     /api/admin/settings       JWT      api        Update username/password (validated)
+GET     /api/health               Public   -          Health check
+
+
+SECURITY IMPROVEMENTS (DONE)
+----------------------------
+- [x] Rate limiting (login, promo, API)
+- [x] Input validation (express-validator)
+- [x] JWT secret validation (min 16 chars)
+- [x] CORS restriction (whitelist domains)
+- [x] Error messages (non-verbose)
+- [x] Winston logging (error.log + combined.log)
+- [x] AuthContext dengan JWT decode + auto-logout
+- [x] Axios interceptor (401 auto-logout)
+- [x] No hardcoded credentials
+- [x] Bcrypt salt rounds (12)
 
 
 FIRESTORE DATA STRUCTURE (FINAL)
@@ -151,6 +170,7 @@ Collection: products
   image: "https://...",                 // Wajib (URL)
   shopeeLink: "https://...",            // Opsional
   tokopediaLink: "https://...",         // Opsional
+  isSold: false,                        // Default false
   createdAt: "2026-08-14T..."
 }
 Aturan: Minimal satu link harus diisi
@@ -159,22 +179,22 @@ Collection: admins
 {
   id: "auto-generated",
   username: "admin",
-  passwordHash: "$2b$10$...",           // bcrypt hash
+  passwordHash: "$2b$12$...",           // bcrypt hash (salt 12)
   createdAt: "2026-08-14T..."
 }
 
 
-DESIGN THEME
-------------
+DESIGN THEME (FINAL)
+--------------------
 Element        | Style
-Theme          | Clean Brick White
-Background     | White (#FFFFFF)
-Primary        | Slate/Gray (#64748B)
-Accent         | Warm Brick (#B45309)
-Typography     | Inter (Google Fonts)
-Cards          | White dengan shadow
-Navbar         | White + border bottom
-Buttons        | Brick accent + hover
+Theme          | Clean Cream + Monochrome
+Background     | Cream (#e6e1d1)
+Primary        | Dark (#040405)
+Accent         | Muted (#bfbaa7, #8a7a60)
+Typography     | Inter, Orbitron, Press Start 2P
+Cards          | Cream dengan shadow
+Navbar         | Cream + border
+Buttons        | Cream + monochrome hover
 
 
 TECH STACK (FINAL)
@@ -184,13 +204,13 @@ Frontend:
 - Vite 5.0.8
 - Tailwind CSS 3.4.0
 - React Router DOM 6.22.0
-- Axios 1.6.7 (dengan publicApi & interceptor)
-- Framer Motion 11.0.0
+- Axios 1.6.7 (publicApi & interceptor)
 - Lucide React 0.344.0
 - React Hot Toast 2.4.1
 - React Three Fiber 8.15.0
 - React Three Drei 9.88.0
 - Three.js 0.160.0
+- jwt-decode 4.0.0
 
 Backend:
 - Node.js (Express 4.19.2)
@@ -199,6 +219,9 @@ Backend:
 - Firebase Admin SDK 12.3.0
 - CORS 2.8.5
 - Dotenv 16.4.5
+- Express Rate Limit 7.4.0
+- Express Validator 7.2.0
+- Winston 3.17.0
 
 Database:
 - Firebase Firestore (NoSQL Cloud Database)
@@ -214,13 +237,15 @@ VITE_API_URL=http://localhost:5000/api
 
 server/.env
 PORT=5000
-JWT_SECRET=gamesvault_super_secret_key_2026
+JWT_SECRET=[min 16 chars random string]
 PROMO_CODE=GAMER2026
+LOG_LEVEL=info
 
-# Firebase Admin SDK (optional, bisa pake serviceAccountKey.json)
+# Firebase Admin SDK
 FIREBASE_PROJECT_ID=gamesvault-web
 FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
 FIREBASE_CLIENT_EMAIL=firebase-adminsdk-xxx@gamesvault-web.iam.gserviceaccount.com
+FIREBASE_STORAGE_BUCKET=gamesvault-web.firebasestorage.app
 
 
 PROGRESS STATUS (FINAL)
@@ -232,8 +257,8 @@ CP-4: Product Carousel                 ✅ DONE
 CP-5: Login Page                       ✅ DONE
 CP-6: Admin Panel + CRUD               ✅ DONE
 CP-7: Backend + Firebase + JWT         ✅ DONE
-CP-8: Polish (Frontend Final Touch)    ⏳ NEXT
-CP-9: Deploy to Vercel                 ⏳ BELUM
+CP-8: Polish (Frontend Final Touch)    ✅ DONE
+CP-9: Deploy to Vercel                 ⏳ NEXT
 
 
 FEATURE LIST (FINAL)
@@ -248,7 +273,13 @@ Frontend:
 - [x] Admin Settings (ganti username/password) (CP-7)
 - [x] publicApi & protected routes (CP-7)
 - [x] Conditional Navbar (admin/home) (CP-7)
-- [ ] Polish & Responsive (CP-8)
+- [x] Responsive design (mobile/tablet)
+- [x] Loading states (skeleton)
+- [x] SOLD overlay on products
+- [x] Logo PNG (Navbar + Footer)
+- [x] Shopee/Tokopedia buttons with logos
+- [x] Cream monochrome theme
+- [x] JWT auto-logout on expired token
 
 Backend:
 - [x] Express server (CP-7)
@@ -257,6 +288,10 @@ Backend:
 - [x] CRUD products (CP-7)
 - [x] Bcrypt password hashing (CP-7)
 - [x] Admin settings endpoint (CP-7)
+- [x] Rate limiting (CP-8)
+- [x] Input validation (CP-8)
+- [x] Winston logging (CP-8)
+- [x] CORS restriction (CP-8)
 
 Security:
 - [x] Promo code static di .env
@@ -264,6 +299,12 @@ Security:
 - [x] JWT expires in 24 hours
 - [x] Protected routes (verifyToken middleware)
 - [x] Public routes ga pake token (publicApi)
+- [x] Rate limiting (auth & API)
+- [x] Input validation (express-validator)
+- [x] JWT secret validation
+- [x] Non-verbose error messages
+- [x] Winston logging
+- [x] Auto-logout on token expired
 
 
 DEPLOYMENT PLAN (CP-9)
@@ -272,59 +313,23 @@ Service    | Untuk
 Vercel     | Frontend + Backend (serverless functions)
 Firebase   | Firestore Database
 
-Vercel Setup:
-1. Hubungkan repository GitHub ke Vercel
-2. Set environment variables di Vercel dashboard
-3. Deploy otomatis setiap push ke main branch
+Vercel Environment Variables:
+- VITE_API_URL=https://[project-name].vercel.app/api
+- JWT_SECRET=[random string]
+- PROMO_CODE=GAMER2026
+- FIREBASE_PROJECT_ID=gamesvault-web
+- FIREBASE_PRIVATE_KEY="..."
+- FIREBASE_CLIENT_EMAIL=...
+- FIREBASE_STORAGE_BUCKET=gamesvault-web.firebasestorage.app
 
-
-GUIDE: MENAMBAHKAN 3D MODEL ASSETS
-----------------------------------
-1. Format yang didukung:
-   - .glb (GLTF Binary) - REKOMENDASI
-   - .gltf (GLTF JSON) + texture folder
-
-2. Sumber Model 3D Gratis:
-   - Sketchfab (filter by "Free Download")
-   - Poly Haven
-   - TurboSquid (free section)
-   - CGTrader (free section)
-
-3. Cara Menambahkan:
-   a. Download file .glb
-   b. Masukkan ke folder: client/public/models/
-   c. Update DeviceModel.jsx:
-
-   // Tambahkan case baru
-   case 'NamaDevice':
-     return (
-       <group position={position}>
-         <primitive 
-           object={useGLTF('/models/nama-file.glb').scene} 
-           scale={[0.5, 0.5, 0.5]} // Sesuaikan ukuran
-         />
-         <meshStandardMaterial color={color} />
-       </group>
-     );
-
-   d. Tambahkan device ke array di HandheldShowcase.jsx:
-   const devices = ['PSP', 'DS Lite', 'PS Vita', '3DS', '2DS', 'NamaDevice'];
-
-4. Tips Optimasi:
-   - Kompres model dengan Draco compression
-   - Gunakan meshoptimizer untuk ukuran lebih kecil
-   - Pastikan texture resolution tidak terlalu besar (max 1024x1024)
-
-5. Contoh Kode Lengkap:
-   import { useGLTF } from '@react-three/drei';
-   ...
-   case 'NamaDevice':
-     const { scene } = useGLTF('/models/nama-file.glb');
-     return (
-       <group position={position}>
-         <primitive object={scene} scale={[0.5, 0.5, 0.5]} />
-       </group>
-     );
+Vercel Setup Steps:
+1. Connect GitHub repository to Vercel
+2. Add all environment variables in Vercel dashboard
+3. Configure build settings:
+   - Build Command: cd client && npm run build
+   - Output Directory: client/dist
+4. Set Node.js version: 20.x
+5. Deploy (auto on push to main branch)
 
 
 NOTES (UPDATED)
@@ -350,13 +355,9 @@ Product Validation:
 - Minimal salah satu link harus diisi
 
 Data Source:
-- ✅ Semua data produk dari Firestore (bukan JSON/dummy)
-- ✅ Admin credentials dari Firestore (bukan JSON/dummy)
-- ✅ Authentication pake JWT (bukan dummy)
-
-Public & Protected Routes:
-- ✅ Public: /validate-promo, /login, /products (GET) → publicApi
-- ✅ Protected: /products (POST/PUT/DELETE), /admin/settings → api (JWT)
+- ✅ Semua data produk dari Firestore
+- ✅ Admin credentials dari Firestore
+- ✅ Authentication pake JWT
 
 
 DEVELOPMENT PHASES (FINAL)
@@ -382,17 +383,18 @@ Phase 3: Integration - ✅ DONE
 - [x] Firebase Firestore (CP-7)
 - [x] publicApi & conditional navbar (CP-7)
 
-Phase 4: Polish - ⏳ NEXT (CP-8)
-- [ ] Responsive design (mobile/tablet)
-- [ ] Loading states
-- [ ] Error handling
-- [ ] UI/UX final touch
+Phase 4: Polish - ✅ DONE
+- [x] Responsive design (mobile/tablet)
+- [x] Loading states (skeleton)
+- [x] Error handling
+- [x] UI/UX final touch (Cream monochrome theme)
+- [x] Security hardening
 
-Phase 5: Deployment - ⏳ BELUM (CP-9)
+Phase 5: Deployment - ⏳ NEXT (CP-9)
 - [ ] Deploy to Vercel
-- [ ] Environment Variables
+- [ ] Environment Variables setup
 - [ ] Production testing
 
 
-Status: Development (CP-7 Done, CP-8 Next)
-Last Updated: 2026-08-18
+Status: Ready for Deployment (CP-9 Next)
+Last Updated: 2026-09-09
