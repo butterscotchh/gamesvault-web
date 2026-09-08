@@ -1,0 +1,62 @@
+{"level":"info","message":"✅ Service account loaded from file","timestamp":"2026-09-08T20:24:34.243Z"}
+{"level":"info","message":"🔥 Firebase Admin initialized successfully!","timestamp":"2026-09-08T20:24:34.280Z"}
+{"level":"info","message":"🚀 Server started on port 5000","timestamp":"2026-09-08T20:24:34.513Z"}
+{"level":"info","message":"🔥 Firebase Connected","timestamp":"2026-09-08T20:24:34.513Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-08T20:24:45.848Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-08T20:24:45.930Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-08T20:24:47.916Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-08T20:24:47.983Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-08T20:27:16.666Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-08T20:27:20.395Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-08T20:27:20.432Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-08T20:29:51.240Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-08T20:29:51.297Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-08T20:29:58.109Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-08T20:29:58.181Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-08T20:30:00.090Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-08T20:30:00.132Z"}
+{"level":"info","message":"✅ Promo code valid: KERJABEGO","timestamp":"2026-09-08T20:30:03.640Z"}
+{"level":"info","message":"✅ Login success: akbar","timestamp":"2026-09-08T20:30:10.100Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-08T20:30:10.185Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-08T20:30:10.224Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-08T20:30:12.570Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-08T20:30:12.611Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-08T20:30:17.693Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-08T20:30:17.734Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-08T20:31:36.961Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-08T20:31:37.016Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-08T20:31:43.959Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-08T20:31:44.067Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-08T20:31:46.546Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-08T20:31:46.579Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-08T20:31:47.364Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-08T20:31:47.395Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-08T20:31:51.648Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-08T20:31:51.678Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-08T20:31:52.594Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-08T20:31:52.632Z"}
+{"level":"info","message":"✅ Promo code valid: KERJABEGO","timestamp":"2026-09-08T20:32:04.448Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-08T20:32:08.520Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-08T20:32:08.546Z"}
+{"level":"info","message":"✅ Promo code valid: KERJABEGO","timestamp":"2026-09-08T20:33:02.252Z"}
+{"level":"warn","message":"❌ Login failed: akbarr (not found)","timestamp":"2026-09-08T20:33:09.077Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-08T20:33:40.423Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-08T20:33:40.481Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-08T20:33:52.373Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-08T20:33:52.430Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-08T20:34:32.105Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-08T20:34:32.145Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-08T20:36:41.008Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-08T20:36:41.051Z"}
+{"level":"info","message":"✅ Service account loaded from file","timestamp":"2026-09-08T20:38:09.214Z"}
+{"level":"info","message":"🔥 Firebase Admin initialized successfully!","timestamp":"2026-09-08T20:38:09.249Z"}
+{"level":"info","message":"🚀 Server started on port 5000","timestamp":"2026-09-08T20:38:09.467Z"}
+{"level":"info","message":"🔥 Firebase Connected","timestamp":"2026-09-08T20:38:09.467Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-08T20:38:18.241Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-08T20:38:18.295Z"}
+{"level":"info","message":"✅ Promo code valid: KERJABEGO","timestamp":"2026-09-08T20:38:21.151Z"}
+{"level":"info","message":"✅ Login success: akbar","timestamp":"2026-09-08T20:38:29.693Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-08T20:38:29.752Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-08T20:38:29.802Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-08T20:38:32.319Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-08T20:38:32.358Z"}

@@ -2,29 +2,75 @@ const express = require('express');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+const rateLimit = require('express-rate-limit');
+const { body, validationResult } = require('express-validator');
 require('dotenv').config();
 const { db } = require('./firebase');
+const logger = require('./logger');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// ============ ENV VALIDATION ============
+const PROMO_CODE = process.env.PROMO_CODE;
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!PROMO_CODE) {
+  logger.error('❌ PROMO_CODE tidak ditemukan di .env!');
+  process.exit(1);
+}
+if (!JWT_SECRET || JWT_SECRET.length < 10) {
+  logger.error('❌ JWT_SECRET harus minimal 10 karakter!');
+  process.exit(1);
+}
+
 // ============ MIDDLEWARE ============
-app.use(cors());
-app.use(express.json());
+
+// CORS - Batasi origin
+const corsOptions = {
+  origin: [
+    'https://gamerhandheld.vercel.app',
+    'http://localhost:3000',
+    'http://localhost:5173',
+  ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+};
+app.use(cors(corsOptions));
+app.use(express.json({ limit: '10mb' }));
+
+// ============ RATE LIMITING ============
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 menit
+  max: 5, // 5 percobaan
+  message: { error: 'Terlalu banyak percobaan, coba lagi nanti!' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+const apiLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 menit
+  max: 30,
+  message: { error: 'Terlalu banyak request, coba lagi nanti!' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 // ============ JWT VERIFY MIDDLEWARE ============
 const verifyToken = (req, res, next) => {
   const authHeader = req.headers.authorization;
   if (!authHeader) {
+    logger.warn('❌ Token tidak ditemukan');
     return res.status(401).json({ error: 'Token diperlukan!' });
   }
 
   const token = authHeader.split(' ')[1];
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, JWT_SECRET);
     req.user = decoded;
     next();
   } catch (error) {
+    logger.warn('❌ Token tidak valid:', error.message);
     return res.status(401).json({ error: 'Token tidak valid!' });
   }
 };
@@ -32,16 +78,24 @@ const verifyToken = (req, res, next) => {
 // ============ AUTH ENDPOINTS ============
 
 // POST: Login Admin
-app.post('/api/login', async (req, res) => {
+app.post('/api/login', authLimiter, async (req, res) => {
   try {
     const { username, password } = req.body;
 
+    // Validasi input
+    if (!username || typeof username !== 'string' || username.trim().length === 0) {
+      return res.status(400).json({ error: 'Username wajib diisi!' });
+    }
+    if (!password || typeof password !== 'string' || password.length < 6) {
+      return res.status(400).json({ error: 'Password minimal 6 karakter!' });
+    }
+
     const snapshot = await db.collection('admins')
-      .where('username', '==', username)
+      .where('username', '==', username.trim())
       .get();
 
     if (snapshot.empty) {
-      console.log(`❌ Login failed: ${username} (not found)`);
+      logger.warn(`❌ Login failed: ${username} (not found)`);
       return res.status(401).json({ 
         success: false, 
         error: 'Username atau password salah!' 
@@ -53,7 +107,7 @@ app.post('/api/login', async (req, res) => {
 
     const isValid = await bcrypt.compare(password, adminData.passwordHash);
     if (!isValid) {
-      console.log(`❌ Login failed: ${username} (wrong password)`);
+      logger.warn(`❌ Login failed: ${username} (wrong password)`);
       return res.status(401).json({ 
         success: false, 
         error: 'Username atau password salah!' 
@@ -61,15 +115,12 @@ app.post('/api/login', async (req, res) => {
     }
 
     const token = jwt.sign(
-      { 
-        id: adminDoc.id, 
-        username: adminData.username
-      },
-      process.env.JWT_SECRET,
+      { id: adminDoc.id, username: adminData.username },
+      JWT_SECRET,
       { expiresIn: '24h' }
     );
 
-    console.log(`✅ Login success: ${username}`);
+    logger.info(`✅ Login success: ${username}`);
     res.json({
       success: true,
       message: 'Login berhasil!',
@@ -81,41 +132,49 @@ app.post('/api/login', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Login error:', error);
-    res.status(500).json({ error: 'Terjadi kesalahan server!' });
+    logger.error('Login error:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
 // POST: Validasi Promo Code
-app.post('/api/validate-promo', (req, res) => {
-  const { code } = req.body;
-  const PROMO_CODE = process.env.PROMO_CODE || 'GAMER2026';
+app.post('/api/validate-promo', authLimiter, async (req, res) => {
+  try {
+    const { code } = req.body;
 
-  if (code === PROMO_CODE) {
-    console.log(`✅ Promo code valid: ${code}`);
-    const token = jwt.sign(
-      { promo: true, timestamp: Date.now() },
-      process.env.JWT_SECRET,
-      { expiresIn: '5m' }
-    );
-    res.json({
-      success: true,
-      message: 'Promo code valid!',
-      token
-    });
-  } else {
-    console.log(`❌ Invalid promo code: ${code}`);
-    res.status(401).json({
-      success: false,
-      error: 'Kode promo tidak valid!'
-    });
+    if (!code || typeof code !== 'string' || code.trim().length === 0) {
+      return res.status(400).json({ error: 'Promo code wajib diisi!' });
+    }
+
+    if (code.trim() === PROMO_CODE) {
+      logger.info(`✅ Promo code valid: ${code}`);
+      const token = jwt.sign(
+        { promo: true, timestamp: Date.now() },
+        JWT_SECRET,
+        { expiresIn: '5m' }
+      );
+      res.json({
+        success: true,
+        message: 'Promo code valid!',
+        token
+      });
+    } else {
+      logger.warn(`❌ Invalid promo code: ${code}`);
+      res.status(401).json({
+        success: false,
+        error: 'Kode promo tidak valid!'
+      });
+    }
+  } catch (error) {
+    logger.error('Promo validation error:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
 // ============ PRODUCTS ENDPOINTS ============
 
 // GET: Ambil semua produk
-app.get('/api/products', async (req, res) => {
+app.get('/api/products', apiLimiter, async (req, res) => {
   try {
     const snapshot = await db.collection('products')
       .orderBy('createdAt', 'desc')
@@ -126,54 +185,57 @@ app.get('/api/products', async (req, res) => {
       products.push({ id: doc.id, ...doc.data() });
     });
 
-    console.log(`📦 GET /api/products - ${products.length} products`);
+    logger.info(`📦 GET /api/products - ${products.length} products`);
     res.json(products);
 
   } catch (error) {
-    console.error('Error fetching products:', error);
-    res.status(500).json({ error: 'Gagal mengambil produk!' });
+    logger.error('Error fetching products:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
 // GET: Ambil produk by ID
-app.get('/api/products/:id', async (req, res) => {
+app.get('/api/products/:id', apiLimiter, async (req, res) => {
   try {
     const doc = await db.collection('products').doc(req.params.id).get();
     if (!doc.exists) {
       return res.status(404).json({ error: 'Product not found' });
     }
-    console.log(`📦 GET /api/products/${req.params.id}`);
+    logger.info(`📦 GET /api/products/${req.params.id}`);
     res.json({ id: doc.id, ...doc.data() });
 
   } catch (error) {
-    console.error('Error fetching product:', error);
-    res.status(500).json({ error: 'Gagal mengambil produk!' });
+    logger.error('Error fetching product:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
 // POST: Tambah produk baru (PROTECTED)
-app.post('/api/products', verifyToken, async (req, res) => {
+app.post('/api/products', verifyToken, [
+  body('name').trim().isLength({ min: 1, max: 100 }).withMessage('Nama produk wajib diisi (1-100 karakter)!').escape(),
+  body('shopeeLink').optional().isURL().withMessage('Link Shopee tidak valid!'),
+  body('tokopediaLink').optional().isURL().withMessage('Link Tokopedia tidak valid!'),
+  body('image').optional().isURL().withMessage('URL gambar tidak valid!'),
+], async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   try {
     const { name, image, shopeeLink, tokopediaLink } = req.body;
 
-    if (!name) {
-      return res.status(400).json({ error: 'Nama produk wajib diisi!' });
-    }
-    if (!shopeeLink && !tokopediaLink) {
-      return res.status(400).json({ error: 'Minimal satu link harus diisi!' });
-    }
-
     const productData = {
-      name,
-      image: image || 'https://via.placeholder.com/300x200/9e6b54/ffffff?text=No+Image',
-      shopeeLink: shopeeLink || '',
-      tokopediaLink: tokopediaLink || '',
+      name: name.trim(),
+      image: image && image.trim() !== '' ? image.trim() : 'https://via.placeholder.com/300x200/9e6b54/ffffff?text=No+Image',
+      shopeeLink: shopeeLink ? shopeeLink.trim() : '',
+      tokopediaLink: tokopediaLink ? tokopediaLink.trim() : '',
       isSold: false,
       createdAt: new Date().toISOString()
     };
 
     const docRef = await db.collection('products').add(productData);
-    console.log(`✅ Product added: ${name}`);
+    logger.info(`✅ Product added: ${name}`);
 
     res.status(201).json({ 
       id: docRef.id, 
@@ -181,13 +243,24 @@ app.post('/api/products', verifyToken, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error adding product:', error);
-    res.status(500).json({ error: 'Gagal menambahkan produk!' });
+    logger.error('Error adding product:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
 // PUT: Update produk (PROTECTED)
-app.put('/api/products/:id', verifyToken, async (req, res) => {
+app.put('/api/products/:id', verifyToken, [
+  body('name').trim().isLength({ min: 1, max: 100 }).withMessage('Nama produk wajib diisi (1-100 karakter)!').escape(),
+  body('shopeeLink').optional().isURL().withMessage('Link Shopee tidak valid!'),
+  body('tokopediaLink').optional().isURL().withMessage('Link Tokopedia tidak valid!'),
+  body('image').optional().isURL().withMessage('URL gambar tidak valid!'),
+  body('isSold').optional().isBoolean().withMessage('isSold harus boolean!'),
+], async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   try {
     const { name, image, shopeeLink, tokopediaLink, isSold } = req.body;
     const docRef = db.collection('products').doc(req.params.id);
@@ -197,24 +270,17 @@ app.put('/api/products/:id', verifyToken, async (req, res) => {
       return res.status(404).json({ error: 'Product not found' });
     }
 
-    if (!name) {
-      return res.status(400).json({ error: 'Nama produk wajib diisi!' });
-    }
-    if (!shopeeLink && !tokopediaLink) {
-      return res.status(400).json({ error: 'Minimal satu link harus diisi!' });
-    }
-
     const updateData = {
-      name,
-      image: image || doc.data().image,
-      shopeeLink: shopeeLink || '',
-      tokopediaLink: tokopediaLink || '',
+      name: name.trim(),
+      image: image && image.trim() !== '' ? image.trim() : doc.data().image,
+      shopeeLink: shopeeLink ? shopeeLink.trim() : '',
+      tokopediaLink: tokopediaLink ? tokopediaLink.trim() : '',
       isSold: isSold !== undefined ? isSold : (doc.data().isSold || false),
       updatedAt: new Date().toISOString()
     };
 
     await docRef.update(updateData);
-    console.log(`✏️ Product updated: ${name}`);
+    logger.info(`✏️ Product updated: ${name}`);
 
     res.json({ 
       id: req.params.id, 
@@ -222,8 +288,8 @@ app.put('/api/products/:id', verifyToken, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error updating product:', error);
-    res.status(500).json({ error: 'Gagal mengupdate produk!' });
+    logger.error('Error updating product:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -238,20 +304,30 @@ app.delete('/api/products/:id', verifyToken, async (req, res) => {
     }
 
     await docRef.delete();
-    console.log(`🗑️ Product deleted: ${req.params.id}`);
+    logger.info(`🗑️ Product deleted: ${req.params.id}`);
 
     res.json({ message: 'Product deleted successfully' });
 
   } catch (error) {
-    console.error('Error deleting product:', error);
-    res.status(500).json({ error: 'Gagal menghapus produk!' });
+    logger.error('Error deleting product:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
 // ============ ADMIN SETTINGS ENDPOINT ============
 
 // PUT: Update username & password
-app.put('/api/admin/settings', verifyToken, async (req, res) => {
+app.put('/api/admin/settings', verifyToken, [
+  body('currentUsername').trim().isLength({ min: 1 }).escape(),
+  body('newUsername').optional().trim().isLength({ min: 1 }).escape(),
+  body('currentPassword').isLength({ min: 6 }).withMessage('Password minimal 6 karakter!'),
+  body('newPassword').optional().isLength({ min: 6 }).withMessage('Password minimal 6 karakter!'),
+], async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   try {
     const { currentUsername, newUsername, currentPassword, newPassword } = req.body;
     const userId = req.user.id;
@@ -274,18 +350,18 @@ app.put('/api/admin/settings', verifyToken, async (req, res) => {
 
     if (newUsername) {
       const existing = await db.collection('admins')
-        .where('username', '==', newUsername)
+        .where('username', '==', newUsername.trim())
         .get();
 
       if (!existing.empty) {
         return res.status(400).json({ error: 'Username sudah digunakan!' });
       }
 
-      updateData.username = newUsername;
+      updateData.username = newUsername.trim();
     }
 
     if (newPassword) {
-      updateData.passwordHash = await bcrypt.hash(newPassword, 10);
+      updateData.passwordHash = await bcrypt.hash(newPassword, 12);
     }
 
     if (Object.keys(updateData).length === 0) {
@@ -300,13 +376,13 @@ app.put('/api/admin/settings', verifyToken, async (req, res) => {
     let newToken = null;
     if (newUsername) {
       newToken = jwt.sign(
-        { id: userId, username: newUsername },
-        process.env.JWT_SECRET,
+        { id: userId, username: newUsername.trim() },
+        JWT_SECRET,
         { expiresIn: '24h' }
       );
     }
 
-    console.log(`✏️ Admin settings updated: ${adminData.username} → ${newUsername || adminData.username}`);
+    logger.info(`✏️ Admin settings updated: ${adminData.username} → ${newUsername || adminData.username}`);
     res.json({
       success: true,
       message: 'Settings updated successfully!',
@@ -314,15 +390,29 @@ app.put('/api/admin/settings', verifyToken, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error updating settings:', error);
-    res.status(500).json({ error: 'Gagal update settings!' });
+    logger.error('Error updating settings:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
+});
+
+// ============ HEALTH CHECK ============
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// ============ NOT FOUND HANDLER ============
+app.use((req, res) => {
+  res.status(404).json({ error: 'Endpoint not found' });
+});
+
+// ============ ERROR HANDLER ============
+app.use((err, req, res, next) => {
+  logger.error('Unhandled error:', err);
+  res.status(500).json({ error: 'Internal server error' });
 });
 
 // ============ START SERVER ============
 app.listen(PORT, () => {
-  
-
   console.log('\x1b[38;2;255;105;180m═══════════════════════════════════════════════════════════════════');
   console.log('  Server is running!');
   console.log('\x1b[38;2;255;105;180m  🔥 Firebase Connected!\x1b[0m');
@@ -349,4 +439,6 @@ app.listen(PORT, () => {
   console.log('  Press \x1b[38;2;255;20;147mCtrl + C\x1b[38;2;255;105;180m to stop');
   console.log('═══════════════════════════════════════════════════════════════════\x1b[0m');
 
+  logger.info(`🚀 Server started on port ${PORT}`);
+  logger.info(`🔥 Firebase Connected`);
 });
