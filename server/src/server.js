@@ -25,17 +25,31 @@ if (!JWT_SECRET || JWT_SECRET.length < 10) {
 
 // ============ MIDDLEWARE ============
 
-// CORS - Batasi origin
+// CORS - Dynamic untuk production & development
+const allowedOrigins = [
+  process.env.FRONTEND_URL || 'https://gamerhandheld.vercel.app',
+  'http://localhost:3000',
+  'http://localhost:5173',
+].filter(Boolean);
+
 const corsOptions = {
-  origin: [
-    'https://gamerhandheld.vercel.app',
-    'http://localhost:3000',
-    'http://localhost:5173',
-  ],
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV === 'development') {
+      callback(null, true);
+    } else {
+      console.warn(`⚠️ CORS blocked: ${origin}`);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
   credentials: true,
+  optionsSuccessStatus: 200,
 };
+
 app.use(cors(corsOptions));
 app.use(express.json({ limit: '10mb' }));
 
