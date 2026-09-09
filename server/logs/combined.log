@@ -60,3 +60,26 @@
 {"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-08T20:38:29.802Z"}
 {"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-08T20:38:32.319Z"}
 {"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-08T20:38:32.358Z"}
+{"level":"info","message":"✅ Service account loaded from file","timestamp":"2026-09-09T13:13:31.428Z"}
+{"level":"info","message":"🔥 Firebase Admin initialized successfully!","timestamp":"2026-09-09T13:13:32.332Z"}
+{"level":"info","message":"🚀 Server started on port 5000","timestamp":"2026-09-09T13:13:37.231Z"}
+{"level":"info","message":"🔥 Firebase Connected","timestamp":"2026-09-09T13:13:37.232Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-09T13:13:44.235Z"}
+{"level":"info","message":"✅ Service account loaded from file","timestamp":"2026-09-09T13:14:26.145Z"}
+{"level":"info","message":"🔥 Firebase Admin initialized successfully!","timestamp":"2026-09-09T13:14:26.186Z"}
+{"level":"info","message":"🚀 Server started on port 5000","timestamp":"2026-09-09T13:14:26.432Z"}
+{"level":"info","message":"🔥 Firebase Connected","timestamp":"2026-09-09T13:14:26.432Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-09T13:14:39.816Z"}
+{"level":"info","message":"✅ Service account loaded from file","timestamp":"2026-09-09T13:15:44.750Z"}
+{"level":"info","message":"🔥 Firebase Admin initialized successfully!","timestamp":"2026-09-09T13:15:45.258Z"}
+{"level":"info","message":"🚀 Server started on port 5000","timestamp":"2026-09-09T13:15:46.308Z"}
+{"level":"info","message":"🔥 Firebase Connected","timestamp":"2026-09-09T13:15:46.308Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-09T13:15:51.167Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-09T13:15:51.238Z"}
+{"level":"info","message":"✅ Promo code valid: KERJABEGO","timestamp":"2026-09-09T13:16:04.601Z"}
+{"level":"warn","message":"❌ Login failed: akbar123 (not found)","timestamp":"2026-09-09T13:16:13.644Z"}
+{"level":"info","message":"✅ Login success: akbar","timestamp":"2026-09-09T13:16:17.701Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-09T13:16:17.777Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-09T13:16:17.803Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-09T13:16:23.776Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-09T13:16:23.840Z"}
