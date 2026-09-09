@@ -34,7 +34,6 @@ const allowedOrigins = [
 
 const corsOptions = {
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
     
     if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV === 'development') {
@@ -55,15 +54,15 @@ app.use(express.json({ limit: '10mb' }));
 
 // ============ RATE LIMITING ============
 const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 menit
-  max: 5, // 5 percobaan
+  windowMs: 15 * 60 * 1000,
+  max: 5,
   message: { error: 'Terlalu banyak percobaan, coba lagi nanti!' },
   standardHeaders: true,
   legacyHeaders: false,
 });
 
 const apiLimiter = rateLimit({
-  windowMs: 60 * 1000, // 1 menit
+  windowMs: 60 * 1000,
   max: 30,
   message: { error: 'Terlalu banyak request, coba lagi nanti!' },
   standardHeaders: true,
@@ -91,12 +90,10 @@ const verifyToken = (req, res, next) => {
 
 // ============ AUTH ENDPOINTS ============
 
-// POST: Login Admin
 app.post('/api/login', authLimiter, async (req, res) => {
   try {
     const { username, password } = req.body;
 
-    // Validasi input
     if (!username || typeof username !== 'string' || username.trim().length === 0) {
       return res.status(400).json({ error: 'Username wajib diisi!' });
     }
@@ -151,7 +148,6 @@ app.post('/api/login', authLimiter, async (req, res) => {
   }
 });
 
-// POST: Validasi Promo Code
 app.post('/api/validate-promo', authLimiter, async (req, res) => {
   try {
     const { code } = req.body;
@@ -187,7 +183,6 @@ app.post('/api/validate-promo', authLimiter, async (req, res) => {
 
 // ============ PRODUCTS ENDPOINTS ============
 
-// GET: Ambil semua produk
 app.get('/api/products', apiLimiter, async (req, res) => {
   try {
     const snapshot = await db.collection('products')
@@ -208,7 +203,6 @@ app.get('/api/products', apiLimiter, async (req, res) => {
   }
 });
 
-// GET: Ambil produk by ID
 app.get('/api/products/:id', apiLimiter, async (req, res) => {
   try {
     const doc = await db.collection('products').doc(req.params.id).get();
@@ -224,7 +218,6 @@ app.get('/api/products/:id', apiLimiter, async (req, res) => {
   }
 });
 
-// POST: Tambah produk baru (PROTECTED)
 app.post('/api/products', verifyToken, [
   body('name').trim().isLength({ min: 1, max: 100 }).withMessage('Nama produk wajib diisi (1-100 karakter)!').escape(),
   body('shopeeLink').optional().isURL().withMessage('Link Shopee tidak valid!'),
@@ -262,7 +255,6 @@ app.post('/api/products', verifyToken, [
   }
 });
 
-// PUT: Update produk (PROTECTED)
 app.put('/api/products/:id', verifyToken, [
   body('name').trim().isLength({ min: 1, max: 100 }).withMessage('Nama produk wajib diisi (1-100 karakter)!').escape(),
   body('shopeeLink').optional().isURL().withMessage('Link Shopee tidak valid!'),
@@ -307,7 +299,6 @@ app.put('/api/products/:id', verifyToken, [
   }
 });
 
-// DELETE: Hapus produk (PROTECTED)
 app.delete('/api/products/:id', verifyToken, async (req, res) => {
   try {
     const docRef = db.collection('products').doc(req.params.id);
@@ -328,9 +319,8 @@ app.delete('/api/products/:id', verifyToken, async (req, res) => {
   }
 });
 
-// ============ ADMIN SETTINGS ENDPOINT ============
+// ============ ADMIN SETTINGS ============
 
-// PUT: Update username & password
 app.put('/api/admin/settings', verifyToken, [
   body('currentUsername').trim().isLength({ min: 1 }).escape(),
   body('newUsername').optional().trim().isLength({ min: 1 }).escape(),

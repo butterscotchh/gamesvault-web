@@ -1,12 +1,4 @@
 const winston = require('winston');
-const path = require('path');
-
-// Buat folder logs kalo belum ada
-const fs = require('fs');
-const logDir = 'logs';
-if (!fs.existsSync(logDir)) {
-  fs.mkdirSync(logDir);
-}
 
 const logger = winston.createLogger({
   level: process.env.LOG_LEVEL || 'info',
@@ -21,13 +13,6 @@ const logger = winston.createLogger({
         winston.format.colorize(),
         winston.format.simple()
       ),
-    }),
-    new winston.transports.File({ 
-      filename: path.join(logDir, 'error.log'), 
-      level: 'error' 
-    }),
-    new winston.transports.File({ 
-      filename: path.join(logDir, 'combined.log') 
     }),
   ],
 });
