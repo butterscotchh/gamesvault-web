@@ -27,7 +27,7 @@ if (!JWT_SECRET || JWT_SECRET.length < 10) {
 
 // CORS - Dynamic untuk production & development
 const allowedOrigins = [
-  process.env.FRONTEND_URL || 'https://gamesvault-web.vercel.app',
+  process.env.FRONTEND_URL || 'https://gamesvault.vercel.app',
   'http://localhost:3000',
   'http://localhost:5173',
 ].filter(Boolean);
