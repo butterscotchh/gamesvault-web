@@ -109,3 +109,9 @@
 {"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-09T13:31:31.002Z"}
 {"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-09T13:32:37.004Z"}
 {"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-09T13:32:37.057Z"}
+{"level":"info","message":"✅ Service account loaded from file","timestamp":"2026-09-09T14:08:58.444Z"}
+{"level":"info","message":"🔥 Firebase Admin initialized successfully!","timestamp":"2026-09-09T14:08:59.323Z"}
+{"level":"info","message":"🚀 Server started on port 5000","timestamp":"2026-09-09T14:09:03.400Z"}
+{"level":"info","message":"🔥 Firebase Connected","timestamp":"2026-09-09T14:09:03.401Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-09T14:09:54.681Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-09T14:09:54.756Z"}
