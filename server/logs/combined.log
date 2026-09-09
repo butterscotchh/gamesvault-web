@@ -83,3 +83,29 @@
 {"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-09T13:16:17.803Z"}
 {"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-09T13:16:23.776Z"}
 {"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-09T13:16:23.840Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-09T13:18:37.223Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-09T13:18:37.275Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-09T13:19:14.557Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-09T13:19:14.594Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-09T13:23:32.400Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-09T13:23:32.446Z"}
+{"level":"info","message":"✅ Service account loaded from file","timestamp":"2026-09-09T13:25:35.230Z"}
+{"level":"info","message":"🔥 Firebase Admin initialized successfully!","timestamp":"2026-09-09T13:25:35.268Z"}
+{"level":"info","message":"🚀 Server started on port 5000","timestamp":"2026-09-09T13:25:35.495Z"}
+{"level":"info","message":"🔥 Firebase Connected","timestamp":"2026-09-09T13:25:35.495Z"}
+{"level":"info","message":"✅ Service account loaded from file","timestamp":"2026-09-09T13:25:50.044Z"}
+{"level":"info","message":"🔥 Firebase Admin initialized successfully!","timestamp":"2026-09-09T13:25:50.083Z"}
+{"level":"info","message":"🚀 Server started on port 5000","timestamp":"2026-09-09T13:25:50.304Z"}
+{"level":"info","message":"🔥 Firebase Connected","timestamp":"2026-09-09T13:25:50.304Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-09T13:26:29.066Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-09T13:26:29.141Z"}
+{"level":"info","message":"✅ Service account loaded from file","timestamp":"2026-09-09T13:30:03.391Z"}
+{"level":"info","message":"🔥 Firebase Admin initialized successfully!","timestamp":"2026-09-09T13:30:03.432Z"}
+{"level":"info","message":"🚀 Server started on port 5000","timestamp":"2026-09-09T13:30:03.666Z"}
+{"level":"info","message":"🔥 Firebase Connected","timestamp":"2026-09-09T13:30:03.666Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-09T13:31:18.214Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-09T13:31:18.281Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-09T13:31:30.952Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-09T13:31:31.002Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-09T13:32:37.004Z"}
+{"level":"info","message":"📦 GET /api/products - 5 products","timestamp":"2026-09-09T13:32:37.057Z"}
