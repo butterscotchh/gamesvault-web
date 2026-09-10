@@ -49,35 +49,31 @@ The project also includes a hidden admin access system that allows authorized us
 
 ## 1. Main Page
 
-![Main Page](./screenshots/main-page.png)
+![Main Page](./client/src/assets/demo/mainpage.png)
 
 ## 2. 3D Handheld Showcase
 
-![3D Showcase](./screenshots/3d-showcase.png)
+![3D Showcase](./client/src/assets/demo/3dshowcase.png)
 
-## 3. Color Picker
+## 3. Product Carousel
 
-![Color Picker](./screenshots/color-picker.png)
+![Product Carousel](./client/src/assets/demo/product.png)
 
-## 4. Product Carousel
+## 4. Login Page
 
-![Product Carousel](./screenshots/product-carousel.png)
+![Login Page](./client/src/assets/demo/login.png)
 
-## 5. Login Page
+## 5. Admin Panel
 
-![Login Page](./screenshots/login.png)
+![Admin Panel](./client/src/assets/demo/admin.png)
 
-## 6. Admin Panel
+## 6. Product Management
 
-![Admin Panel](./screenshots/admin-panel.png)
+![Product Management](./client/src/assets/demo/productmanagement.png)
 
-## 7. Product Management
+## 7. Admin Settings
 
-![Product Management](./screenshots/product-management.png)
-
-## 8. Admin Settings
-
-![Admin Settings](./screenshots/admin-settings.png)
+![Admin Settings](./client/src/assets/demo/settings.png)
 
 ---
 

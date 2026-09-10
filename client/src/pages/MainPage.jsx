@@ -74,7 +74,7 @@ const MainPage = () => {
   // ─── SCROLL LISTENER: Muncul pas 40% ───
   useEffect(() => {
     const handleScroll = () => {
-      if (closedStore) return; // Kalo udah di-close, ga muncul lagi
+      if (closedStore) return;
 
       const scrollTop = window.scrollY;
       const docHeight = document.documentElement.scrollHeight - window.innerHeight;
@@ -233,92 +233,104 @@ const MainPage = () => {
       </main>
       <Footer />
 
-      {/* ─── FLOATING OVERLAY: VISIT OUR STORE ─── */}
-      {showStore && (
-        <div
-          className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40"
+     {/* ─── FLOATING OVERLAY ─── */}
+{showStore && (
+  <div
+    className="fixed bottom-3 md:bottom-4 left-1/2 -translate-x-1/2 z-40 w-[95%] max-w-[95%] md:w-auto md:max-w-none"
+    style={{
+      animation: isClosing
+        ? 'slideDown 0.3s ease-in forwards'
+        : 'slideUp 0.4s ease-out',
+    }}
+  >
+    <div
+      className="border-2 px-3 py-2.5 md:px-4 md:py-3 flex flex-col md:flex-row items-center gap-2 md:gap-4"
+      style={{
+        background: '#e6e1d1',
+        borderColor: '#3b3833',
+        boxShadow: '3px 3px 0 #3b3833, 0 4px 16px rgba(0,0,0,0.12)',
+      }}
+    >
+      {/* Top row (mobile): Label + Close */}
+      <div className="flex items-center justify-between w-full md:w-auto md:justify-start gap-2">
+        {/* Label */}
+        <span
           style={{
-            animation: isClosing
-              ? 'slideDown 0.3s ease-in forwards'
-              : 'slideUp 0.4s ease-out',
+            fontFamily: '"Press Start 2P", monospace',
+            fontSize: '7px',
+            color: '#3b3833',
+            letterSpacing: '0.15em',
           }}
         >
-          <div
-            className="border-2 px-4 py-3 flex items-center gap-4"
-            style={{
-              background: '#e6e1d1',
-              borderColor: '#3b3833',
-              boxShadow: '3px 3px 0 #3b3833, 0 4px 16px rgba(0,0,0,0.12)',
-            }}
-          >
-            {/* Label */}
-            <span
-              className="hidden sm:inline"
-              style={{
-                fontFamily: '"Press Start 2P", monospace',
-                fontSize: '8px',
-                color: '#3b3833',
-                letterSpacing: '0.15em',
-              }}
-            >
-              VISIT OUR STORE
-            </span>
+          VISIT OUR STORE
+        </span>
 
-            {/* Buttons */}
-            <div className="flex items-center gap-2">
-              <a
-                href="https://s.shopee.co.id/6fhAiN0DzX"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-4 py-2 transition-all hover:scale-105 active:scale-95"
-                style={{
-                  fontFamily: '"Press Start 2P", monospace',
-                  fontSize: '8px',
-                  letterSpacing: '0.1em',
-                  background: '#e6e1d1',
-                  color: '#040405',
-                  border: '1px solid #bfbaa7',
-                  boxShadow: '2px 2px 0 #a8a390',
-                  textDecoration: 'none',
-                }}
-              >
-                <img src={shopeeLogo} alt="Shopee" className="w-4 h-4 object-contain" />
-                Shopee
-              </a>
+        {/* Close Button Mobile */}
+        <button
+          onClick={handleCloseStore}
+          className="p-1 transition-all hover:opacity-70 md:hidden"
+          style={{ color: '#3b3833' }}
+          aria-label="Close"
+        >
+          <X className="w-4 h-4" />
+        </button>
+      </div>
 
-              <a
-                href="https://www.tokopedia.com/gamesvaultretro"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-4 py-2 transition-all hover:scale-105 active:scale-95"
-                style={{
-                  fontFamily: '"Press Start 2P", monospace',
-                  fontSize: '8px',
-                  letterSpacing: '0.1em',
-                  background: '#e6e1d1',
-                  color: '#040405',
-                  border: '1px solid #bfbaa7',
-                  boxShadow: '2px 2px 0 #a8a390',
-                  textDecoration: 'none',
-                }}
-              >
-                <img src={tokpedLogo} alt="Tokopedia" className="w-4 h-4 object-contain" />
-                Tokopedia
-              </a>
-            </div>
+      {/* Buttons */}
+      <div className="flex items-center gap-2 w-full md:w-auto">
+        <a
+          href="https://s.shopee.co.id/6fhAiN0DzX"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center justify-center gap-1.5 md:gap-2 px-2.5 py-2 md:px-4 md:py-2 transition-all hover:scale-105 active:scale-95 flex-1 md:flex-none"
+          style={{
+            fontFamily: '"Press Start 2P", monospace',
+            fontSize: '7px',
+            letterSpacing: '0.08em',
+            background: '#e6e1d1',
+            color: '#040405',
+            border: '1px solid #bfbaa7',
+            boxShadow: '2px 2px 0 #a8a390',
+            textDecoration: 'none',
+          }}
+        >
+          <img src={shopeeLogo} alt="Shopee" className="w-3.5 h-3.5 md:w-4 md:h-4 object-contain" />
+          Shopee
+        </a>
 
-            {/* Close Button */}
-            <button
-              onClick={handleCloseStore}
-              className="p-1 ml-1 transition-all hover:opacity-70"
-              style={{ color: '#3b3833' }}
-              aria-label="Close"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      )}
+        <a
+          href="https://www.tokopedia.com/gamesvaultretro"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center justify-center gap-1.5 md:gap-2 px-2.5 py-2 md:px-4 md:py-2 transition-all hover:scale-105 active:scale-95 flex-1 md:flex-none"
+          style={{
+            fontFamily: '"Press Start 2P", monospace',
+            fontSize: '7px',
+            letterSpacing: '0.08em',
+            background: '#e6e1d1',
+            color: '#040405',
+            border: '1px solid #bfbaa7',
+            boxShadow: '2px 2px 0 #a8a390',
+            textDecoration: 'none',
+          }}
+        >
+          <img src={tokpedLogo} alt="Tokopedia" className="w-3.5 h-3.5 md:w-4 md:h-4 object-contain" />
+          Tokopedia
+        </a>
+      </div>
+
+      {/* Close Button */}
+      <button
+        onClick={handleCloseStore}
+        className="hidden md:block p-1 ml-1 transition-all hover:opacity-70"
+        style={{ color: '#3b3833' }}
+        aria-label="Close"
+      >
+        <X className="w-4 h-4" />
+      </button>
+    </div>
+  </div>
+)}
 
       {/* Keyframes */}
       <style>{`

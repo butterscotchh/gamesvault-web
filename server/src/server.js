@@ -207,13 +207,17 @@ app.post('/api/validate-promo', async (req, res) => {
 
 app.get('/api/products', apiLimiter, async (req, res) => {
   try {
-    const snapshot = await db.collection('products')
-      .orderBy('createdAt', 'desc')
-      .get();
+    const snapshot = await db.collection('products').get();
 
     const products = [];
     snapshot.forEach(doc => {
       products.push({ id: doc.id, ...doc.data() });
+    });
+
+    products.sort((a, b) => {
+      const orderA = a.order !== undefined ? a.order : 999999;
+      const orderB = b.order !== undefined ? b.order : 999999;
+      return orderA - orderB;
     });
 
     logger.info(`📦 GET /api/products - ${products.length} products`);
@@ -254,17 +258,28 @@ app.post('/api/products', verifyToken, [
   try {
     const { name, image, shopeeLink, tokopediaLink } = req.body;
 
+    const snapshot = await db.collection('products').get();
+    let minOrder = 0;
+    snapshot.forEach(doc => {
+      const order = doc.data().order;
+      if (order !== undefined && order < minOrder) {
+        minOrder = order;
+      }
+    });
+    const newOrder = minOrder - 1;
+
     const productData = {
       name: name.trim(),
       image: image && image.trim() !== '' ? image.trim() : 'https://via.placeholder.com/300x200/9e6b54/ffffff?text=No+Image',
       shopeeLink: shopeeLink ? shopeeLink.trim() : '',
       tokopediaLink: tokopediaLink ? tokopediaLink.trim() : '',
       isSold: false,
+      order: newOrder,
       createdAt: new Date().toISOString()
     };
 
     const docRef = await db.collection('products').add(productData);
-    logger.info(`✅ Product added: ${name}`);
+    logger.info(`✅ Product added: ${name} (order: ${newOrder})`);
 
     res.status(201).json({ 
       id: docRef.id, 
@@ -312,6 +327,7 @@ app.put('/api/products/:id', verifyToken, [
 
     res.json({ 
       id: req.params.id, 
+      ...doc.data(),
       ...updateData
     });
 
@@ -333,10 +349,65 @@ app.delete('/api/products/:id', verifyToken, async (req, res) => {
     await docRef.delete();
     logger.info(`🗑️ Product deleted: ${req.params.id}`);
 
+    const snapshot = await db.collection('products').get();
+    const allProducts = [];
+    snapshot.forEach(d => {
+      allProducts.push({ id: d.id, ...d.data() });
+    });
+
+    allProducts.sort((a, b) => {
+      const orderA = a.order !== undefined ? a.order : 999999;
+      const orderB = b.order !== undefined ? b.order : 999999;
+      return orderA - orderB;
+    });
+
+    const batch = db.batch();
+    allProducts.forEach((product, index) => {
+      const ref = db.collection('products').doc(product.id);
+      batch.update(ref, { order: index + 1 });
+    });
+    await batch.commit();
+
+    logger.info(`🔢 Order reset for ${allProducts.length} products`);
+
     res.json({ message: 'Product deleted successfully' });
 
   } catch (error) {
     logger.error('Error deleting product:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.put('/api/products/order/bulk', verifyToken, async (req, res) => {
+  try {
+    const { orders } = req.body;
+
+    if (!Array.isArray(orders) || orders.length === 0) {
+      return res.status(400).json({ error: 'Orders array diperlukan!' });
+    }
+
+    const batch = db.batch();
+    orders.forEach(item => {
+      if (item.id && item.order !== undefined) {
+        const ref = db.collection('products').doc(item.id);
+        batch.update(ref, { 
+          order: item.order,
+          updatedAt: new Date().toISOString()
+        });
+      }
+    });
+
+    await batch.commit();
+
+    logger.info(`🔢 Bulk order updated: ${orders.length} products`);
+    res.json({ 
+      success: true, 
+      message: `Updated ${orders.length} products order`,
+      updated: orders.length
+    });
+
+  } catch (error) {
+    logger.error('Error bulk updating order:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

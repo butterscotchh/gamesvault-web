@@ -10,18 +10,18 @@ const ProductCarousel = () => {
   const itemsPerPage = 4;
 
   useEffect(() => {
-    const loadProducts = async () => {
-      try {
-        const res = await publicApi.get('/products');
-        setProducts(res.data);
-      } catch (err) {
-        console.error('Error loading products:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadProducts();
-  }, []);
+  const loadProducts = async () => {
+    try {
+      const res = await publicApi.get('/products');
+      setProducts(res.data);
+    } catch (err) {
+      console.error('Error loading products:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+  loadProducts();
+}, []);
 
   const totalPages = Math.ceil(products.length / itemsPerPage);
   const nextPage   = () => setCurrentPage(p => (p + 1) % totalPages);

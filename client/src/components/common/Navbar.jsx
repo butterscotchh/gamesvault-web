@@ -28,7 +28,7 @@ const PromoForm = ({ promoCode, setPromoCode, onSubmit, isLoading, className = '
         type="text"
         value={promoCode}
         onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
-        placeholder="ENTER CODE..."
+        placeholder="ENTER PROMO CODE..."
         style={{
           fontFamily: '"Orbitron", sans-serif',
           background: '#d5d0c0',
