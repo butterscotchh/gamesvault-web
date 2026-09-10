@@ -219,9 +219,9 @@ app.get('/api/products/:id', apiLimiter, async (req, res) => {
 
 app.post('/api/products', verifyToken, [
   body('name').trim().isLength({ min: 1, max: 100 }).withMessage('Nama produk wajib diisi (1-100 karakter)!').escape(),
-  body('shopeeLink').optional().isURL().withMessage('Link Shopee tidak valid!'),
-  body('tokopediaLink').optional().isURL().withMessage('Link Tokopedia tidak valid!'),
-  body('image').optional().isURL().withMessage('URL gambar tidak valid!'),
+  body('shopeeLink').optional({ checkFalsy: true }).isURL().withMessage('Link Shopee tidak valid!'),
+  body('tokopediaLink').optional({ checkFalsy: true }).isURL().withMessage('Link Tokopedia tidak valid!'),
+  body('image').optional({ checkFalsy: true }).isURL().withMessage('URL gambar tidak valid!'),
 ], async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -256,9 +256,9 @@ app.post('/api/products', verifyToken, [
 
 app.put('/api/products/:id', verifyToken, [
   body('name').trim().isLength({ min: 1, max: 100 }).withMessage('Nama produk wajib diisi (1-100 karakter)!').escape(),
-  body('shopeeLink').optional().isURL().withMessage('Link Shopee tidak valid!'),
-  body('tokopediaLink').optional().isURL().withMessage('Link Tokopedia tidak valid!'),
-  body('image').optional().isURL().withMessage('URL gambar tidak valid!'),
+  body('shopeeLink').optional({ checkFalsy: true }).isURL().withMessage('Link Shopee tidak valid!'),
+  body('tokopediaLink').optional({ checkFalsy: true }).isURL().withMessage('Link Tokopedia tidak valid!'),
+  body('image').optional({ checkFalsy: true }).isURL().withMessage('URL gambar tidak valid!'),
   body('isSold').optional().isBoolean().withMessage('isSold harus boolean!'),
 ], async (req, res) => {
   const errors = validationResult(req);
