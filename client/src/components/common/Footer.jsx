@@ -1,5 +1,5 @@
 import { Instagram, AtSign } from 'lucide-react';
-import logo from '../../assets/logo.png'; // ← SESUAIKAN PATH
+import logo from '../../assets/logo.png';
 
 // ─── TikTok SVG ───
 const TikTokIcon = ({ className = "w-5 h-5" }) => (
@@ -45,7 +45,7 @@ const Footer = () => {
       <div className="container mx-auto px-4 py-12 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
 
-          {/* Brand - Pake Logo */}
+          {/* Brand Logo */}
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center gap-3 mb-4">
               <img 

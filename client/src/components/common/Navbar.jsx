@@ -77,7 +77,6 @@ const Navbar = () => {
     try {
       const existingToken = localStorage.getItem('adminToken');
 
-      // Cek token pake jwtDecode (bukan manual)
       if (existingToken && isTokenValid(existingToken)) {
         toast.success('Session masih aktif! Redirecting...');
         setTimeout(() => navigate('/admin'), 1000);

@@ -25,7 +25,6 @@ if (!JWT_SECRET || JWT_SECRET.length < 10) {
 
 // ============ MIDDLEWARE ============
 
-// CORS - Dynamic untuk production & development
 const allowedOrigins = [
   process.env.FRONTEND_URL || 'https://gamesvault.vercel.app',
   'http://localhost:3000',
@@ -148,7 +147,7 @@ app.post('/api/login', authLimiter, async (req, res) => {
   }
 });
 
-app.post('/api/validate-promo', authLimiter, async (req, res) => {
+app.post('/api/validate-promo', async (req, res) => {
   try {
     const { code } = req.body;
 

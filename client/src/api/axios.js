@@ -8,7 +8,7 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  timeout: 10000, // 10 detik timeout
+  timeout: 10000,
 });
 
 // ─── INTERCEPTOR REQUEST ───
@@ -30,13 +30,11 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    // Kalo token expired (401), logout otomatis
     if (error.response?.status === 401) {
       const token = localStorage.getItem('adminToken');
       if (token) {
         console.warn('⚠️ Token expired, logging out...');
         localStorage.removeItem('adminToken');
-        // Redirect ke login kalo di halaman admin
         if (window.location.pathname.startsWith('/admin')) {
           window.location.href = '/login';
         }

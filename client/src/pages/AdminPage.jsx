@@ -121,7 +121,10 @@ const AdminPage = () => {
 
     try {
       const response = await api.put(`/products/${id}`, {
-        ...product,
+        name: product.name,
+        image: product.image || '',
+        shopeeLink: product.shopeeLink || '',
+        tokopediaLink: product.tokopediaLink || '',
         isSold: !product.isSold
       });
       setProducts(products.map(p => p.id === id ? response.data : p));
@@ -221,9 +224,9 @@ const AdminPage = () => {
           </div>
         )}
 
-        {/* ─── LIST PRODUCTS (TANPA SCROLL) ─── */}
+        {/* LIST PRODUCTS */}
         <div className="border" style={{ background: '#ffffff', borderColor: '#d5c8b8' }}>
-          {/* Desktop: Table */}
+          {/* Desktop */}
           <div className="hidden sm:block">
             <table className="w-full text-sm">
               <thead className="border-b" style={{ background: '#f5f0eb', borderColor: '#d5c8b8' }}>
@@ -272,7 +275,7 @@ const AdminPage = () => {
             </table>
           </div>
 
-          {/* Mobile: Card View */}
+          {/* Mobile */}
           <div className="sm:hidden divide-y" style={{ borderColor: '#ece3d8' }}>
             {products.length === 0 ? (
               <div className="px-3 py-6 text-center text-xs" style={{ color: '#8a7a6a' }}>Belum ada produk.</div>

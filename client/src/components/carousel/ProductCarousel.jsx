@@ -28,7 +28,7 @@ const ProductCarousel = () => {
   const prevPage   = () => setCurrentPage(p => (p - 1 + totalPages) % totalPages);
   const goToPage   = (i) => setCurrentPage(i);
 
-  // ─── AUTO-SLIDE DIMATIKAN ───
+  // ─── AUTO-SLIDE ───
   // useEffect(() => {
   //   if (totalPages > 1) {
   //     const t = setInterval(nextPage, 5000);

@@ -19,7 +19,6 @@ const AdminSettings = () => {
     confirmPassword: ''
   });
 
-  // Ambil data admin dari localStorage
   useEffect(() => {
     const token = localStorage.getItem('adminToken');
     if (token) {

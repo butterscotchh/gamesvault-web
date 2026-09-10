@@ -16,13 +16,11 @@ const LoginPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validasi input
     if (!username.trim() || !password.trim()) {
       toast.error('Username dan password wajib diisi!');
       return;
     }
 
-    // Rate limiting lokal (tambahan)
     if (attempts >= 5) {
       toast.error('Terlalu banyak percobaan, coba lagi nanti!');
       return;

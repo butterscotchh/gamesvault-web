@@ -12,7 +12,6 @@ export const AuthProvider = ({ children }) => {
     if (!token) return false;
     try {
       const decoded = jwtDecode(token);
-      // Cek apakah token sudah expired
       return decoded.exp * 1000 > Date.now();
     } catch {
       return false;
@@ -25,7 +24,6 @@ export const AuthProvider = ({ children }) => {
     if (token && isTokenValid(token)) {
       setIsAuthenticated(true);
     } else {
-      // Token ga valid / expired → hapus
       localStorage.removeItem('adminToken');
       setIsAuthenticated(false);
     }

@@ -3,7 +3,6 @@ const admin = require('firebase-admin');
 // ============ LOAD SERVICE ACCOUNT ============
 let serviceAccount;
 try {
-  // Di Vercel, pake environment variables
   const projectId = process.env.FIREBASE_PROJECT_ID;
   const privateKey = process.env.FIREBASE_PRIVATE_KEY;
   const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
@@ -16,7 +15,6 @@ try {
     };
     console.log('✅ Firebase loaded from environment variables');
   } else {
-    // Fallback ke file (local development)
     serviceAccount = require('../serviceAccountKey.json');
     console.log('✅ Firebase loaded from file');
   }
