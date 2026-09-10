@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Plus, Trash2, Edit, X, Save, Home } from 'lucide-react';
+import { Plus, Trash2, Edit, X, Save, Home, History, RefreshCw } from 'lucide-react';
 import api from '../api/axios';
 import toast from 'react-hot-toast';
 
@@ -13,6 +13,12 @@ const AdminPage = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
   
+  // ─── LOGIN LOGS STATE ───
+  const [logs, setLogs] = useState([]);
+  const [logsLoading, setLogsLoading] = useState(false);
+  const [logsFilter, setLogsFilter] = useState('all');
+  const [showLogs, setShowLogs] = useState(false);
+
   const [formData, setFormData] = useState({
     name: '',
     image: '',
@@ -34,6 +40,43 @@ const AdminPage = () => {
     };
     loadProducts();
   }, []);
+
+  // ─── LOAD LOGS ───
+  const loadLogs = async (filter = 'all') => {
+    setLogsLoading(true);
+    try {
+      const response = await api.get(`/admin/login-logs?filter=${filter}&limit=50`);
+      setLogs(response.data);
+    } catch (error) {
+      console.error('Error loading logs:', error);
+      toast.error('Gagal load login logs!');
+    } finally {
+      setLogsLoading(false);
+    }
+  };
+
+  const handleShowLogs = () => {
+    setShowLogs(true);
+    loadLogs(logsFilter);
+  };
+
+  const handleFilterChange = (e) => {
+    const filter = e.target.value;
+    setLogsFilter(filter);
+    loadLogs(filter);
+  };
+
+  const handleCleanupLogs = async () => {
+    if (!window.confirm('Hapus log lebih dari 30 hari?')) return;
+    try {
+      const response = await api.delete('/admin/login-logs/cleanup');
+      toast.success(`Berhasil hapus ${response.data.deleted} log!`);
+      loadLogs(logsFilter);
+    } catch (error) {
+      console.error('Error cleaning logs:', error);
+      toast.error('Gagal hapus log!');
+    }
+  };
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -162,6 +205,9 @@ const AdminPage = () => {
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             <button onClick={() => navigate('/')} className="px-2 py-1 text-xs" style={{ color: '#4a3a2a' }}>Home</button>
+            <button onClick={handleShowLogs} className="px-2 py-1 text-xs flex items-center gap-1" style={{ color: '#4a3a2a' }}>
+              <History className="w-3 h-3" /> Logs
+            </button>
             <button onClick={() => navigate('/admin/settings')} className="px-2 py-1 text-xs" style={{ color: '#4a3a2a' }}>Settings</button>
             <button onClick={handleLogout} className="px-2 py-1 text-xs" style={{ color: '#cc0000' }}>Logout</button>
           </div>
@@ -181,6 +227,99 @@ const AdminPage = () => {
             </button>
           )}
         </div>
+
+        {/* ─── LOGIN LOGS SECTION ─── */}
+        {showLogs && (
+          <div className="mb-6 border" style={{ background: '#ffffff', borderColor: '#d5c8b8' }}>
+            <div className="p-3 border-b flex items-center justify-between flex-wrap gap-2" style={{ borderColor: '#d5c8b8', background: '#f5f0eb' }}>
+              <div className="flex items-center gap-3">
+                <History className="w-4 h-4" style={{ color: '#2c2c2c' }} />
+                <span className="text-sm font-semibold" style={{ color: '#2c2c2c' }}>Login History</span>
+                <select
+                  value={logsFilter}
+                  onChange={handleFilterChange}
+                  className="text-xs px-2 py-1 border"
+                  style={{ borderColor: '#d5c8b8', background: '#ffffff', color: '#2c2c2c' }}
+                >
+                  <option value="all">All</option>
+                  <option value="success">Success</option>
+                  <option value="failed">Failed</option>
+                </select>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => loadLogs(logsFilter)}
+                  className="p-1 transition-all hover:opacity-70"
+                  style={{ color: '#4a3a2a' }}
+                  title="Refresh"
+                >
+                  <RefreshCw className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  onClick={handleCleanupLogs}
+                  className="px-2 py-1 text-[10px] border"
+                  style={{ borderColor: '#cc0000', color: '#cc0000' }}
+                  title="Hapus log > 30 hari"
+                >
+                  Cleanup
+                </button>
+                <button
+                  onClick={() => setShowLogs(false)}
+                  className="p-1"
+                  style={{ color: '#8a7a6a' }}
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            <div className="max-h-80 overflow-y-auto">
+              {logsLoading ? (
+                <div className="p-6 text-center text-xs" style={{ color: '#8a7a6a' }}>Loading logs...</div>
+              ) : logs.length === 0 ? (
+                <div className="p-6 text-center text-xs" style={{ color: '#8a7a6a' }}>Belum ada log.</div>
+              ) : (
+                <table className="w-full text-sm">
+                  <thead className="border-b" style={{ background: '#faf8f6', borderColor: '#ece3d8' }}>
+                    <tr>
+                      <th className="px-3 py-2 text-left text-xs font-medium" style={{ color: '#4a3a2a' }}>Status</th>
+                      <th className="px-3 py-2 text-left text-xs font-medium" style={{ color: '#4a3a2a' }}>Username</th>
+                      <th className="px-3 py-2 text-left text-xs font-medium" style={{ color: '#4a3a2a' }}>Reason</th>
+                      <th className="px-3 py-2 text-left text-xs font-medium" style={{ color: '#4a3a2a' }}>Time</th>
+                      <th className="px-3 py-2 text-left text-xs font-medium hidden md:table-cell" style={{ color: '#4a3a2a' }}>User Agent</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {logs.map((log) => (
+                      <tr key={log.id} className="border-b" style={{ borderColor: '#ece3d8' }}>
+                        <td className="px-3 py-2">
+                          <span
+                            className="px-2 py-0.5 text-[10px] border"
+                            style={{
+                              borderColor: log.success ? '#3b3833' : '#cc0000',
+                              background: log.success ? '#3b3833' : 'transparent',
+                              color: log.success ? '#f5f0eb' : '#cc0000',
+                            }}
+                          >
+                            {log.success ? 'SUCCESS' : 'FAILED'}
+                          </span>
+                        </td>
+                        <td className="px-3 py-2 text-xs font-medium" style={{ color: '#2c2c2c' }}>{log.username}</td>
+                        <td className="px-3 py-2 text-xs" style={{ color: '#6a5a4a' }}>{log.reason || '-'}</td>
+                        <td className="px-3 py-2 text-xs" style={{ color: '#6a5a4a' }}>
+                          {new Date(log.timestamp).toLocaleString('id-ID')}
+                        </td>
+                        <td className="px-3 py-2 text-xs truncate max-w-[200px] hidden md:table-cell" style={{ color: '#8a7a6a' }}>
+                          {log.userAgent?.substring(0, 50)}...
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Form */}
         {showForm && (
@@ -226,7 +365,6 @@ const AdminPage = () => {
 
         {/* LIST PRODUCTS */}
         <div className="border" style={{ background: '#ffffff', borderColor: '#d5c8b8' }}>
-          {/* Desktop */}
           <div className="hidden sm:block">
             <table className="w-full text-sm">
               <thead className="border-b" style={{ background: '#f5f0eb', borderColor: '#d5c8b8' }}>

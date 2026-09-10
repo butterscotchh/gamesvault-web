@@ -104,7 +104,15 @@ app.post('/api/login', authLimiter, async (req, res) => {
       .where('username', '==', username.trim())
       .get();
 
+    // ─── LOG: Username ga ketemu ───
     if (snapshot.empty) {
+      await db.collection('login_logs').add({
+        username: username.trim(),
+        success: false,
+        reason: 'not_found',
+        userAgent: req.headers['user-agent'] || 'unknown',
+        timestamp: new Date().toISOString(),
+      });
       logger.warn(`❌ Login failed: ${username} (not found)`);
       return res.status(401).json({ 
         success: false, 
@@ -116,7 +124,16 @@ app.post('/api/login', authLimiter, async (req, res) => {
     const adminData = adminDoc.data();
 
     const isValid = await bcrypt.compare(password, adminData.passwordHash);
+
+    // ─── LOG: Password salah ───
     if (!isValid) {
+      await db.collection('login_logs').add({
+        username: username.trim(),
+        success: false,
+        reason: 'wrong_password',
+        userAgent: req.headers['user-agent'] || 'unknown',
+        timestamp: new Date().toISOString(),
+      });
       logger.warn(`❌ Login failed: ${username} (wrong password)`);
       return res.status(401).json({ 
         success: false, 
@@ -129,6 +146,15 @@ app.post('/api/login', authLimiter, async (req, res) => {
       JWT_SECRET,
       { expiresIn: '24h' }
     );
+
+    // ─── LOG: Login berhasil ───
+    await db.collection('login_logs').add({
+      username: adminData.username,
+      success: true,
+      reason: 'success',
+      userAgent: req.headers['user-agent'] || 'unknown',
+      timestamp: new Date().toISOString(),
+    });
 
     logger.info(`✅ Login success: ${username}`);
     res.json({
@@ -401,6 +427,69 @@ app.put('/api/admin/settings', verifyToken, [
 // ============ HEALTH CHECK ============
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// ============ LOGIN LOGS ENDPOINT ============
+
+// GET: Ambil login logs (PROTECTED)
+app.get('/api/admin/login-logs', verifyToken, async (req, res) => {
+  try {
+    const { filter = 'all', limit = 50 } = req.query;
+
+    let query = db.collection('login_logs')
+      .orderBy('timestamp', 'desc')
+      .limit(parseInt(limit));
+
+    // Filter
+    if (filter === 'success') {
+      query = query.where('success', '==', true);
+    } else if (filter === 'failed') {
+      query = query.where('success', '==', false);
+    }
+
+    const snapshot = await query.get();
+
+    const logs = [];
+    snapshot.forEach(doc => {
+      logs.push({ id: doc.id, ...doc.data() });
+    });
+
+    logger.info(`📋 GET /api/admin/login-logs - ${logs.length} logs`);
+    res.json(logs);
+
+  } catch (error) {
+    logger.error('Error fetching login logs:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// DELETE: Hapus log lama (> 30 hari)
+app.delete('/api/admin/login-logs/cleanup', verifyToken, async (req, res) => {
+  try {
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const snapshot = await db.collection('login_logs')
+      .where('timestamp', '<', thirtyDaysAgo.toISOString())
+      .get();
+
+    const batch = db.batch();
+    snapshot.forEach(doc => {
+      batch.delete(doc.ref);
+    });
+
+    await batch.commit();
+
+    logger.info(`🗑️ Cleaned up ${snapshot.size} old login logs`);
+    res.json({ 
+      message: `Cleaned up ${snapshot.size} old login logs`,
+      deleted: snapshot.size
+    });
+
+  } catch (error) {
+    logger.error('Error cleaning up logs:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
 // ============ NOT FOUND HANDLER ============
