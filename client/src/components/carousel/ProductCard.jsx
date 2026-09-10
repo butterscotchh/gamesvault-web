@@ -99,7 +99,7 @@ const ProductCard = ({ product }) => {
               }}
             >
               <img src={tokpedLogo} alt="Tokopedia" className="w-4 h-4 object-contain" />
-              TOPED
+              TOKOPEDIA
             </a>
           )}
           {!isSold && !hasShopee && !hasTokopedia && (

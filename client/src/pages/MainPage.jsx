@@ -1,8 +1,11 @@
+import { useState, useEffect } from 'react';
 import Navbar from '../components/common/Navbar';
 import Footer from '../components/common/Footer';
 import ProductCarousel from '../components/carousel/ProductCarousel';
 import HandheldShowcase from '../components/3D/HandheldShowcase';
-import { Gamepad2, ChevronDown } from 'lucide-react';
+import { Gamepad2, ChevronDown, X } from 'lucide-react';
+import shopeeLogo from '../assets/shopee.png';
+import tokpedLogo from '../assets/tokped.png';
 
 import sigil1 from '../assets/sigils/cybersigilism.png';
 import sigil2 from '../assets/sigils/cybersigilism2.png';
@@ -61,8 +64,39 @@ const SigilMark = ({ src, size = 20, opacity = 0.5, rotate = 0 }) => (
 );
 
 const MainPage = () => {
+  const [showStore, setShowStore] = useState(false);
+  const [closedStore, setClosedStore] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
+
   const scrollToShowcase = () =>
     document.getElementById('showcase')?.scrollIntoView({ behavior: 'smooth' });
+
+  // ─── SCROLL LISTENER: Muncul pas 40% ───
+  useEffect(() => {
+    const handleScroll = () => {
+      if (closedStore) return; // Kalo udah di-close, ga muncul lagi
+
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+
+      setShowStore(scrollPercent >= 40);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    handleScroll(); // Cek pas pertama kali load
+
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [closedStore]);
+
+  const handleCloseStore = () => {
+    setIsClosing(true);
+    setTimeout(() => {
+      setShowStore(false);
+      setClosedStore(true);
+      setIsClosing(false);
+    }, 300); // Delay 300ms sesuai durasi animasi
+  };
 
   return (
     <div className="min-h-screen overflow-x-hidden" style={{ background: '#e6e1d1', color: '#040405' }}>
@@ -81,14 +115,6 @@ const MainPage = () => {
           <div className="absolute top-0 bottom-0 left-8 w-px pointer-events-none" style={{ background: 'linear-gradient(180deg, transparent, #bfbaa7, transparent)' }} />
           <div className="absolute top-0 bottom-0 right-8 w-px pointer-events-none" style={{ background: 'linear-gradient(180deg, transparent, #bfbaa7, transparent)' }} />
 
-          {/* Sigil decorations — scattered around the edges so they never
-              collide with the centered headline / CTA */}
-          {/* <Sigil src={sigil2} className="top-14 left-6 md:left-10" size={150} opacity={0.10} delay="0s"   duration="8s" rotate={-4} />
-          <Sigil src={sigil4} className="top-16 right-6 md:right-14" size={120} opacity={0.09} delay="1.5s" duration="9s" rotate={12} />
-          <Sigil src={sigil5} className="top-1/3 left-4 md:left-10 hidden lg:block" size={110} opacity={0.07} delay="3s" duration="7s" rotate={-16} flipX />
-          <Sigil src={sigil3} className="bottom-1/3 right-4 md:right-12 hidden lg:block" size={130} opacity={0.08} delay="0.8s" duration="10s" rotate={9} />
-          <Sigil src={sigil4} className="bottom-20 left-8 md:left-16" size={105} opacity={0.08} delay="2s" duration="8s" rotate={-160} flipY />
-          <Sigil src={sigil5} className="bottom-14 right-8 md:right-16" size={115} opacity={0.07} delay="4s" duration="7s" rotate={18} /> */}
           <Sigil src={sigil1} className="top-[10px] left-[-10px] md:right-6 -translate-y-1/2 opacity-0 lg:block`" size={350} opacity={0} delay="1s" duration="11s" />
           <Sigil src={sigil5} className="bottom-4 right-2 md:right-6 -translate-y-1/2lg:block" size={350} opacity={0} delay="1s" rotate={180} invert={true} duration="11s" />
 
@@ -164,7 +190,6 @@ const MainPage = () => {
 
             {/* CTA */}
             <button onClick={scrollToShowcase} className="btn-nier inline-flex items-center gap-3">
-              <Gamepad2 className="w-4 h-4" />
               EXPLORE NOW
             </button>
           </div>
@@ -207,6 +232,118 @@ const MainPage = () => {
 
       </main>
       <Footer />
+
+      {/* ─── FLOATING OVERLAY: VISIT OUR STORE ─── */}
+      {showStore && (
+        <div
+          className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40"
+          style={{
+            animation: isClosing
+              ? 'slideDown 0.3s ease-in forwards'
+              : 'slideUp 0.4s ease-out',
+          }}
+        >
+          <div
+            className="border-2 px-4 py-3 flex items-center gap-4"
+            style={{
+              background: '#e6e1d1',
+              borderColor: '#3b3833',
+              boxShadow: '3px 3px 0 #3b3833, 0 4px 16px rgba(0,0,0,0.12)',
+            }}
+          >
+            {/* Label */}
+            <span
+              className="hidden sm:inline"
+              style={{
+                fontFamily: '"Press Start 2P", monospace',
+                fontSize: '8px',
+                color: '#3b3833',
+                letterSpacing: '0.15em',
+              }}
+            >
+              VISIT OUR STORE
+            </span>
+
+            {/* Buttons */}
+            <div className="flex items-center gap-2">
+              <a
+                href="https://s.shopee.co.id/6fhAiN0DzX"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-2 transition-all hover:scale-105 active:scale-95"
+                style={{
+                  fontFamily: '"Press Start 2P", monospace',
+                  fontSize: '8px',
+                  letterSpacing: '0.1em',
+                  background: '#e6e1d1',
+                  color: '#040405',
+                  border: '1px solid #bfbaa7',
+                  boxShadow: '2px 2px 0 #a8a390',
+                  textDecoration: 'none',
+                }}
+              >
+                <img src={shopeeLogo} alt="Shopee" className="w-4 h-4 object-contain" />
+                Shopee
+              </a>
+
+              <a
+                href="https://www.tokopedia.com/gamesvaultretro"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-2 transition-all hover:scale-105 active:scale-95"
+                style={{
+                  fontFamily: '"Press Start 2P", monospace',
+                  fontSize: '8px',
+                  letterSpacing: '0.1em',
+                  background: '#e6e1d1',
+                  color: '#040405',
+                  border: '1px solid #bfbaa7',
+                  boxShadow: '2px 2px 0 #a8a390',
+                  textDecoration: 'none',
+                }}
+              >
+                <img src={tokpedLogo} alt="Tokopedia" className="w-4 h-4 object-contain" />
+                Tokopedia
+              </a>
+            </div>
+
+            {/* Close Button */}
+            <button
+              onClick={handleCloseStore}
+              className="p-1 ml-1 transition-all hover:opacity-70"
+              style={{ color: '#3b3833' }}
+              aria-label="Close"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Keyframes */}
+      <style>{`
+        @keyframes slideUp {
+          from {
+            opacity: 0;
+            transform: translate(-50%, 20px);
+          }
+          to {
+            opacity: 1;
+            transform: translate(-50%, 0);
+          }
+        }
+
+        @keyframes slideDown {
+          from {
+            opacity: 1;
+            transform: translate(-50%, 0);
+          }
+          to {
+            opacity: 0;
+            transform: translate(-50%, 20px);
+          }
+        }
+      `}</style>
     </div>
   );
 };

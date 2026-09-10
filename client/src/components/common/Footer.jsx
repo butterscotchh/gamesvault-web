@@ -63,7 +63,7 @@ const Footer = () => {
               </div>
             </div>
             <p style={{ fontFamily: '"VT323", monospace', fontSize: '18px', color: '#585046', letterSpacing: '0.06em', lineHeight: 1.6 }}>
-              Showroom untuk para pecinta gaming handheld.<br />
+              Website showroom untuk para pecinta gaming handheld.<br />
               Temukan koleksi PSP, DS, PS Vita, dan lainnya.
             </p>
             <div className="flex items-center gap-2 mt-5">

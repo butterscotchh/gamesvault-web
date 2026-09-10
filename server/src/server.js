@@ -104,7 +104,6 @@ app.post('/api/login', authLimiter, async (req, res) => {
       .where('username', '==', username.trim())
       .get();
 
-    // ─── LOG: Username ga ketemu ───
     if (snapshot.empty) {
       await db.collection('login_logs').add({
         username: username.trim(),
@@ -125,7 +124,6 @@ app.post('/api/login', authLimiter, async (req, res) => {
 
     const isValid = await bcrypt.compare(password, adminData.passwordHash);
 
-    // ─── LOG: Password salah ───
     if (!isValid) {
       await db.collection('login_logs').add({
         username: username.trim(),
@@ -147,7 +145,6 @@ app.post('/api/login', authLimiter, async (req, res) => {
       { expiresIn: '24h' }
     );
 
-    // ─── LOG: Login berhasil ───
     await db.collection('login_logs').add({
       username: adminData.username,
       success: true,
@@ -431,7 +428,6 @@ app.get('/api/health', (req, res) => {
 
 // ============ LOGIN LOGS ENDPOINT ============
 
-// GET: Ambil login logs (PROTECTED)
 app.get('/api/admin/login-logs', verifyToken, async (req, res) => {
   try {
     const { filter = 'all', limit = 50 } = req.query;
@@ -440,7 +436,6 @@ app.get('/api/admin/login-logs', verifyToken, async (req, res) => {
       .orderBy('timestamp', 'desc')
       .limit(parseInt(limit));
 
-    // Filter
     if (filter === 'success') {
       query = query.where('success', '==', true);
     } else if (filter === 'failed') {
@@ -463,7 +458,6 @@ app.get('/api/admin/login-logs', verifyToken, async (req, res) => {
   }
 });
 
-// DELETE: Hapus log lama (> 30 hari)
 app.delete('/api/admin/login-logs/cleanup', verifyToken, async (req, res) => {
   try {
     const thirtyDaysAgo = new Date();
