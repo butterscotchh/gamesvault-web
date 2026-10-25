@@ -575,3 +575,5 @@ Developed by my amazing friends
 - Francent Jienarta
 
 ⭐ If you find this project useful, feel free to leave a star on the repository.
+
+- GamesVault 2026
