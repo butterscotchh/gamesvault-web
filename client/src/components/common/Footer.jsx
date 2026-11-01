@@ -63,8 +63,8 @@ const Footer = () => {
               </div>
             </div>
             <p style={{ fontFamily: '"VT323", monospace', fontSize: '18px', color: '#585046', letterSpacing: '0.06em', lineHeight: 1.6 }}>
-              Website showroom untuk para pecinta gaming handheld.<br />
-              Temukan koleksi PSP, DS, PS Vita, dan lainnya.
+              GamesVault, sanctuary of your memories<br />
+              Reclaim your memories now.
             </p>
             <div className="flex items-center gap-2 mt-5">
               <span className="w-1.5 h-1.5 animate-blink" style={{ background: '#3b3833', display: 'inline-block' }} />
