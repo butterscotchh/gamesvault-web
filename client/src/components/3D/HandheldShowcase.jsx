@@ -109,7 +109,7 @@ const HandheldShowcase = () => {
               <span style={{ fontFamily: '"VT323", monospace', fontSize: '13px', color: '#585046', letterSpacing: '0.12em' }}>AUTO ROTATE</span>
             </div>
 
-            <Canvas camera={{ position: [0, 2, 8], fov: 110 }}>
+            <Canvas camera={{ position: [0, 2, 15], fov: 50 }}>
               <color attach="background" args={['#d5d0c0']} />
               <fog attach="fog" args={['#d5d0c0', 14, 24]} />
               <OrbitControls
