@@ -183,9 +183,9 @@ const MainPage = () => {
               color: '#585046',
               letterSpacing: '0.06em',
             }}>
-              Temukan koleksi gaming handheld terbaik dari berbagai generasi.{' '}
+              Reclaim your childhood memories.{' '}
               <span style={{ color: '#3b3833', fontWeight: 700 }}>PSP, DS, PS Vita, 3DS</span>{' '}
-              dan masih banyak lagi.
+              and many others.
             </p>
 
             {/* CTA */}
@@ -221,7 +221,7 @@ const MainPage = () => {
                 <div className="h-px w-20" style={{ background: 'linear-gradient(90deg, #bfbaa7, transparent)' }} />
               </div>
               <p className="mt-4" style={{ fontFamily: '"VT323", monospace', fontSize: '19px', color: '#8a7a60', letterSpacing: '0.1em' }}>
-                Koleksi handheld terbaik untuk kamu
+                All memories, in one place.
               </p>
             </div>
             <ProductCarousel />

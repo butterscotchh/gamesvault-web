@@ -2,10 +2,9 @@ import { useState, Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Environment } from '@react-three/drei';
 import DeviceModel from './DeviceModel';
-import ColorPicker from '../common/ColorPicker';
 import { RotateCcw } from 'lucide-react';
 
-const devices = ['PSP', 'DS Lite', 'PS Vita', '3DS', '2DS'];
+const devices = ['3DS', 'NDS', 'PSP', 'PS Vita'];
 
 const SigilCornerTL = () => (
   <svg width="32" height="32" viewBox="0 0 32 32" fill="none" style={{ color: '#585046' }}>
@@ -32,23 +31,7 @@ const SigilCornerBR = () => (
 );
 
 const HandheldShowcase = () => {
-  const [selectedColor, setSelectedColor] = useState('#2d2d2d');
-
-  const colors = [
-    { name: 'Onyx',   value: '#2d2d2d' },
-    { name: 'White',  value: '#f5f5f5' },
-    { name: 'Silver', value: '#c0c0c0' },
-    { name: 'Red',    value: '#dc2626' },
-    { name: 'Blue',   value: '#2563eb' },
-    { name: 'Green',  value: '#16a34a' },
-    { name: 'Purple', value: '#9333ea' },
-    { name: 'Gold',   value: '#d4af37' },
-  ];
-
-  const getDevicePosition = (index) => {
-    const positions = [[-3.5,0,0],[-1.8,0,0],[0,0,0],[1.8,0,0],[3.5,0,0]];
-    return positions[index] || [index * 2 - 4, 0, 0];
-  };
+  const [selectedDevice, setSelectedDevice] = useState('PSP');
 
   return (
     <div className="w-full py-16 relative overflow-hidden" style={{ background: 'linear-gradient(180deg, #bfbaa7 0%, #ccc7b5 50%, #bfbaa7 100%)' }}>
@@ -70,13 +53,35 @@ const HandheldShowcase = () => {
             <div className="h-px w-16" style={{ background: 'linear-gradient(90deg, #a8a390, transparent)' }} />
           </div>
           <p style={{ fontFamily: '"VT323", monospace', fontSize: '17px', color: '#585046', letterSpacing: '0.1em' }}>
-            Drag to rotate &bull; Scroll to zoom &bull; Pick a color below
+            Drag to rotate &bull; Scroll to zoom &bull; Select a console below
           </p>
         </div>
 
-        {/* Color picker */}
-        <div className="flex justify-center mb-8">
-          <ColorPicker colors={colors} selectedColor={selectedColor} onColorChange={setSelectedColor} />
+        {/* Console selector */}
+        <div className="flex flex-wrap justify-center gap-2 mb-5" role="group" aria-label="Select handheld console">
+          {devices.map((device) => {
+            const isSelected = selectedDevice === device;
+
+            return (
+              <button
+                key={device}
+                type="button"
+                onClick={() => setSelectedDevice(device)}
+                aria-pressed={isSelected}
+                className="px-4 py-2 transition-colors"
+                style={{
+                  fontFamily: '"Press Start 2P", monospace',
+                  fontSize: '9px',
+                  color: isSelected ? '#f0ead8' : '#585046',
+                  background: isSelected ? '#585046' : 'transparent',
+                  border: '1px solid #585046',
+                  boxShadow: isSelected ? '2px 2px 0 #a8a390' : 'none',
+                }}
+              >
+                {device}
+              </button>
+            );
+          })}
         </div>
 
         {/* Window frame */}
@@ -93,7 +98,7 @@ const HandheldShowcase = () => {
           </div>
 
           {/* Canvas */}
-          <div className="relative w-full h-[400px] scanlines" style={{ background: '#d5d0c0' }}>
+          <div className="relative w-full h-[600px] scanlines" style={{ background: '#d5d0c0' }}>
             <div className="absolute top-0 left-0 z-10 pointer-events-none" style={{ opacity: 0.6 }}><SigilCornerTL /></div>
             <div className="absolute bottom-0 right-0 z-10 pointer-events-none" style={{ opacity: 0.6 }}><SigilCornerBR /></div>
             <div className="absolute top-0 right-0 z-10 pointer-events-none" style={{ opacity: 0.4, transform: 'scaleX(-1)' }}><SigilCornerTL /></div>
@@ -107,16 +112,26 @@ const HandheldShowcase = () => {
             <Canvas camera={{ position: [0, 2, 8], fov: 50 }}>
               <color attach="background" args={['#d5d0c0']} />
               <fog attach="fog" args={['#d5d0c0', 14, 24]} />
-              <OrbitControls enableZoom enablePan={false} minDistance={4} maxDistance={15} autoRotate autoRotateSpeed={1.5} />
+              <OrbitControls
+                enableZoom
+                enablePan={false}
+                minDistance={4}
+                maxDistance={15}
+                autoRotate
+                autoRotateSpeed={0.25}
+              />
               <ambientLight intensity={0.9} color="#e6e1d1" />
               <directionalLight position={[10, 10, 10]} intensity={1.0} color="#ffffff" />
               <directionalLight position={[-10, -5, -5]} intensity={0.4} color="#e6e1d1" />
               <pointLight position={[0, 5, 0]} intensity={0.3} color="#bfbaa7" />
               <Environment preset="apartment" />
               <Suspense fallback={null}>
-                {devices.map((device, index) => (
-                  <DeviceModel key={device} device={device} color={selectedColor} position={getDevicePosition(index)} />
-                ))}
+                {/* Render exactly one model: only the selected console is mounted. */}
+                <DeviceModel
+                  key={selectedDevice}
+                  device={selectedDevice}
+                  position={[0, 0, 0]}
+                />
               </Suspense>
             </Canvas>
           </div>
@@ -127,19 +142,14 @@ const HandheldShowcase = () => {
               ◈ RENDER ACTIVE
             </span>
             <span style={{ fontFamily: '"VT323", monospace', fontSize: '14px', color: '#8a7a60', letterSpacing: '0.1em' }}>
-              {devices.length} MODELS LOADED
+              {selectedDevice.toUpperCase()} LOADED
             </span>
           </div>
         </div>
 
-        {/* Device labels */}
-        <div className="flex justify-center gap-4 md:gap-10 mt-5">
-          {devices.map((device) => (
-            <span key={device} style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '8px', color: '#585046', letterSpacing: '0.1em' }}>
-              {device}
-            </span>
-          ))}
-        </div>
+        <p className="text-center mt-5" style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '9px', color: '#585046', letterSpacing: '0.1em' }}>
+          SELECTED DEVICE: {selectedDevice.toUpperCase()}
+        </p>
 
       </div>
 
